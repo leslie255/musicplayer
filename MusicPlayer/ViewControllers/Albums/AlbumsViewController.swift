@@ -8,39 +8,31 @@
 import UIKit
 
 class AlbumsViewController: UICollectionViewController {
-    
-    let placeHolderData: [UIImage?] = [
-        nil,
-        nil,
-        nil,
-        nil,
-        nil,
-    ]
-
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         1
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        self.placeHolderData.count
+        MusicLibrary.shared.albums.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AlbumsCell", for: indexPath) as! AlbumsCell
         cell.setupLayer()
-        cell.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tap(_:))))
-        cell.albumArtView.image = self.placeHolderData[indexPath.row] ?? UIImage(systemName: "music.note.list")
+        cell.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapOnAlbum(_:))))
+        cell.albumArtView.image = UIImage(systemName: "music.note.list")
         return cell
     }
     
-    @objc func tap(_ sender: UITapGestureRecognizer) {
+    @objc func tapOnAlbum(_ sender: UITapGestureRecognizer) {
         let p = sender.location(in: self.collectionView!)
         let indexPath = self.collectionView.indexPathForItem(at: p)!
-        print("Tapped: \(indexPath)")
-        
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let albumVC = storyboard.instantiateViewController(withIdentifier: "AlbumViewController") as! AlbumViewController
-        self.navigationController!.pushViewController(albumVC, animated: true)
+        if let album = MusicLibrary.shared.albums[checked: indexPath.row] {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let albumVC = storyboard.instantiateViewController(withIdentifier: "AlbumViewController") as! AlbumViewController
+            albumVC.album = album
+            self.navigationController!.pushViewController(albumVC, animated: true)
+        }
     }
 }
 

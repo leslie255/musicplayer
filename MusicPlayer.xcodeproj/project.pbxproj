@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		580E99EC2A32812E00F8211A /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580E99EB2A32812E00F8211A /* Utils.swift */; };
 		582C95172A301AD500015F05 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582C95162A301AD500015F05 /* AppDelegate.swift */; };
 		582C95192A301AD500015F05 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582C95182A301AD500015F05 /* SceneDelegate.swift */; };
 		582C951E2A301AD500015F05 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 582C951C2A301AD500015F05 /* Main.storyboard */; };
@@ -19,10 +20,12 @@
 		582C954B2A30221F00015F05 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582C954A2A30221F00015F05 /* AlbumViewController.swift */; };
 		582C954D2A30225A00015F05 /* ArtistsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582C954C2A30225A00015F05 /* ArtistsVC.swift */; };
 		582C954F2A30228100015F05 /* GenresVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582C954E2A30228100015F05 /* GenresVC.swift */; };
+		5846DEA52A374A7C000455B2 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5846DEA42A374A7C000455B2 /* Player.swift */; };
 		585EB0292A309E0B003F0066 /* AlbumTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EB0282A309E0B003F0066 /* AlbumTrackCell.swift */; };
 		585EB02B2A309E6D003F0066 /* AlbumBannerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EB02A2A309E6D003F0066 /* AlbumBannerCell.swift */; };
 		585EB02E2A30EE01003F0066 /* AlbumsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EB02D2A30EE01003F0066 /* AlbumsViewController.swift */; };
 		585EB0302A30EF73003F0066 /* AlbumsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585EB02F2A30EF73003F0066 /* AlbumsCell.swift */; };
+		586042DC2A312A380080CEB1 /* MusicLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 586042DB2A312A380080CEB1 /* MusicLibrary.swift */; };
 		58B94CF02A304A8E00D11463 /* SongsTrackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B94CEF2A304A8E00D11463 /* SongsTrackCell.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +47,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		580E99EB2A32812E00F8211A /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		582C95132A301AD500015F05 /* MusicPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		582C95162A301AD500015F05 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		582C95182A301AD500015F05 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -60,10 +64,12 @@
 		582C954A2A30221F00015F05 /* AlbumViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		582C954C2A30225A00015F05 /* ArtistsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsVC.swift; sourceTree = "<group>"; };
 		582C954E2A30228100015F05 /* GenresVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenresVC.swift; sourceTree = "<group>"; };
+		5846DEA42A374A7C000455B2 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		585EB0282A309E0B003F0066 /* AlbumTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumTrackCell.swift; sourceTree = "<group>"; };
 		585EB02A2A309E6D003F0066 /* AlbumBannerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumBannerCell.swift; sourceTree = "<group>"; };
 		585EB02D2A30EE01003F0066 /* AlbumsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsViewController.swift; sourceTree = "<group>"; };
 		585EB02F2A30EF73003F0066 /* AlbumsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsCell.swift; sourceTree = "<group>"; };
+		586042DB2A312A380080CEB1 /* MusicLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicLibrary.swift; sourceTree = "<group>"; };
 		58B94CEF2A304A8E00D11463 /* SongsTrackCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsTrackCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -117,11 +123,14 @@
 			children = (
 				582C95162A301AD500015F05 /* AppDelegate.swift */,
 				582C95182A301AD500015F05 /* SceneDelegate.swift */,
+				586042DB2A312A380080CEB1 /* MusicLibrary.swift */,
+				5846DEA42A374A7C000455B2 /* Player.swift */,
 				58B94CE52A302CAB00D11463 /* ViewControllers */,
 				582C951C2A301AD500015F05 /* Main.storyboard */,
 				582C951F2A301AD700015F05 /* Assets.xcassets */,
 				582C95212A301AD700015F05 /* LaunchScreen.storyboard */,
 				582C95242A301AD700015F05 /* Info.plist */,
+				580E99EB2A32812E00F8211A /* Utils.swift */,
 			);
 			path = MusicPlayer;
 			sourceTree = "<group>";
@@ -167,6 +176,7 @@
 			children = (
 				585EB02D2A30EE01003F0066 /* AlbumsViewController.swift */,
 				585EB02F2A30EF73003F0066 /* AlbumsCell.swift */,
+				585EB0252A309CA5003F0066 /* Album */,
 			);
 			path = Albums;
 			sourceTree = "<group>";
@@ -175,7 +185,6 @@
 			isa = PBXGroup;
 			children = (
 				585EB02C2A30EDE5003F0066 /* Albums */,
-				585EB0252A309CA5003F0066 /* Album */,
 				585EB0242A309C92003F0066 /* Songs */,
 				582C954C2A30225A00015F05 /* ArtistsVC.swift */,
 				582C954E2A30228100015F05 /* GenresVC.swift */,
@@ -199,6 +208,8 @@
 			dependencies = (
 			);
 			name = MusicPlayer;
+			packageProductDependencies = (
+			);
 			productName = MusicPlayer;
 			productReference = 582C95132A301AD500015F05 /* MusicPlayer.app */;
 			productType = "com.apple.product-type.application";
@@ -271,6 +282,8 @@
 				Base,
 			);
 			mainGroup = 582C950A2A301AD500015F05;
+			packageReferences = (
+			);
 			productRefGroup = 582C95142A301AD500015F05 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -317,7 +330,10 @@
 				58B94CF02A304A8E00D11463 /* SongsTrackCell.swift in Sources */,
 				585EB0302A30EF73003F0066 /* AlbumsCell.swift in Sources */,
 				585EB0292A309E0B003F0066 /* AlbumTrackCell.swift in Sources */,
+				586042DC2A312A380080CEB1 /* MusicLibrary.swift in Sources */,
+				5846DEA52A374A7C000455B2 /* Player.swift in Sources */,
 				582C954D2A30225A00015F05 /* ArtistsVC.swift in Sources */,
+				580E99EC2A32812E00F8211A /* Utils.swift in Sources */,
 				585EB02B2A309E6D003F0066 /* AlbumBannerCell.swift in Sources */,
 				585EB02E2A30EE01003F0066 /* AlbumsViewController.swift in Sources */,
 				582C95492A30220100015F05 /* SongsViewController.swift in Sources */,
@@ -504,6 +520,7 @@
 				DEVELOPMENT_TEAM = RB2CNKU7CM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MusicPlayer/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -517,6 +534,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = leslie255.MusicPlayer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -533,6 +553,7 @@
 				DEVELOPMENT_TEAM = RB2CNKU7CM;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MusicPlayer/Info.plist;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -546,6 +567,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = leslie255.MusicPlayer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

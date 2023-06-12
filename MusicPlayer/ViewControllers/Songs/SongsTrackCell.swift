@@ -16,11 +16,21 @@ class SongsTrackCell: UITableViewCell {
     
     @IBOutlet weak var artistLabel: UILabel!
     
-    override func setSelected(_ selected: Bool, animated: Bool) {
+    func setupLayers() {
+        self.albumArtView.layer.cornerRadius = 4.0
+        self.albumArtView.backgroundColor = .secondarySystemFill
     }
     
-    func setupLayer() {
-        self.albumArtView.layer.cornerRadius = 4.0
-        self.albumArtView.layer.backgroundColor = UIColor.secondarySystemFill.cgColor
+    override func setSelected(_ highlighted: Bool, animated: Bool) {
+        if highlighted {
+            self.backgroundColor = .secondarySystemBackground
+        } else if animated {
+            UIView.animate(withDuration: 0.2) {
+                self.backgroundColor = .systemBackground
+            }
+        } else {
+            self.backgroundColor = .systemBackground
+        }
     }
+    
 }

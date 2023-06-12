@@ -60,11 +60,11 @@
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="SongsTrackCell" id="aeO-xE-r3C" customClass="SongsTrackCell" customModule="MusicPlayer" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="50" width="375" height="56.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" autoresizesSubviews="NO" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="redraw" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="aeO-xE-r3C" id="6c7-rl-jdk">
+                                <tableViewCellContentView key="contentView" autoresizesSubviews="NO" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="redraw" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="aeO-xE-r3C" id="6c7-rl-jdk">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="56.666667938232422"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Wy-9H-iwA" userLabel="Separator">
+                                        <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Wy-9H-iwA" userLabel="Separator">
                                             <rect key="frame" x="68" y="56.333333333333336" width="307" height="0.3333333333333357"/>
                                             <color key="backgroundColor" systemColor="separatorColor"/>
                                             <rect key="contentStretch" x="0.0" y="0.0" width="1" height="0.5"/>
@@ -79,7 +79,7 @@
                                                 <constraint firstAttribute="width" secondItem="eIM-si-A5d" secondAttribute="height" multiplier="1:1" id="fdK-fo-wRS"/>
                                             </constraints>
                                         </imageView>
-                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="ixg-J0-FEL">
+                                        <stackView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="ixg-J0-FEL">
                                             <rect key="frame" x="68" y="8" width="307" height="40.666666666666664"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Track Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="95t-6b-1Hk">
@@ -109,7 +109,6 @@
                                         <constraint firstAttribute="trailing" secondItem="3Wy-9H-iwA" secondAttribute="trailing" id="zGh-7F-Ja5"/>
                                     </constraints>
                                 </tableViewCellContentView>
-                                <inset key="separatorInset" minX="68" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 <connections>
                                     <outlet property="albumArtView" destination="eIM-si-A5d" id="ORD-Op-49q"/>
                                     <outlet property="artistLabel" destination="05H-MR-Zao" id="bPk-PE-hMa"/>
@@ -123,9 +122,6 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Songs" id="jEc-eP-Ly3"/>
-                    <connections>
-                        <outlet property="mainTableView" destination="gHY-I3-Wda" id="KEu-AD-mJt"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="K3n-tr-Fre" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
