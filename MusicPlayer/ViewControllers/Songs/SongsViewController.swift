@@ -32,10 +32,11 @@ class SongsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SongsTrackCell", for: indexPath) as! SongsTrackCell
         let track = MusicLibrary.shared.tracks[indexPath.row]
+        let album = track.album.map(MusicLibrary.shared.album(forID:))
         cell.setupLayers()
         cell.trackLabel.text = track.name
         cell.artistLabel.text = MusicLibrary.shared.artist(forID: track.artist).name
-        let albumArtImage = UIImage(systemName: "music.note")
+        let albumArtImage = album?.art ?? UIImage(systemName: "music.note")
         cell.albumArtView.image = albumArtImage
         return cell
     }

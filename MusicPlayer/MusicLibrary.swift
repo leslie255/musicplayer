@@ -7,17 +7,20 @@
 
 import Foundation
 import AVFoundation
+import UIKit
 
 class Album {
     var name: String
     var artist: ArtistID
     var tracks: [TrackID]
+    var art: UIImage?
     var genre: String
     
-    init(name: String, artist: ArtistID, tracks: [TrackID], genre: String) {
+    init(name: String, artist: ArtistID, tracks: [TrackID], art: UIImage? = nil, genre: String) {
         self.name = name
         self.artist = artist
         self.tracks = tracks
+        self.art = art
         self.genre = genre
     }
 }
@@ -131,6 +134,23 @@ class MusicLibrary {
     }
     
     private func scanAlbum(url: URL, artist artistID: ArtistID, albumName: String) async {
+        // load _metadata folder
+        let metadataURL = url.appendingPathComponent("_metadata", conformingTo: .directory)
+        var albumArt: UIImage? = nil
+        if let items = try? FileManager.default.contentsOfDirectory(at: metadataURL, includingPropertiesForKeys: [.isRegularFileKey, .isReadableKey]) {
+            for item in items {
+                let filename = item.lastPathComponent
+                // album art
+                if filename.caseInsensitiveCompare("artwork.jpg") == .orderedSame
+                    || filename.caseInsensitiveCompare("artwork.jpeg") == .orderedSame
+                    || filename.caseInsensitiveCompare("artwork.heic") == .orderedSame
+                    || filename.caseInsensitiveCompare("artwork.png") == .orderedSame {
+                    let data = try? Data(contentsOf: item)
+                    albumArt = data.flatMap(UIImage.init(data:))
+                }
+            }
+        }
+        
         let items: [URL]
         do {
             items = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isRegularFileKey, .isReadableKey])
@@ -139,9 +159,13 @@ class MusicLibrary {
             return
         }
         
-        let album = Album(name: albumName, artist: artistID, tracks: [], genre: "Unknown Genre")
+        let album = Album(name: albumName, artist: artistID, tracks: [], art: albumArt, genre: "Unknown Genre")
         let albumID = self.addAlbum(album)
         for trackURL in items {
+            switch trackURL.pathExtension {
+            case "mp3", "flac", "m4a": break
+            default: continue
+            }
             let track = await self.scanTrack(url: trackURL, artist: artistID, album: albumID)
             let trackID = self.addTrack(track)
             album.tracks.append(trackID)
