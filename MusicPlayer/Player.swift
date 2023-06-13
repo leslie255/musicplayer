@@ -12,29 +12,70 @@ class Player {
     
     static let shared = Player()
     
-    private let avplayer = AVPlayer()
+    /// Timer for repeatedly sync elapse time in Now Playing
+    private var syncTimer = Timer()
+    
+    /// Always use `Player.play` and `Player.pause` instead of directly calling `avplayer.play()`/`avplayer.pause()`
+    private var avplayer = AVPlayer()
     
     func setupMPRemoteCommandCenter() {
         let commandCenter = MPRemoteCommandCenter.shared()
         commandCenter.playCommand.addTarget { [unowned self] event in
-            self.avplayer.play()
+            syncElapsedPlaybackTime()
+            play()
             return .success
         }
         commandCenter.pauseCommand.addTarget { [unowned self] event in
-            self.avplayer.pause()
+            syncElapsedPlaybackTime()
+            pause()
             return .success
         }
-        commandCenter.changePlaybackRateCommand.addTarget { [unowned self] event in
+        commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
             let time = (event as! MPChangePlaybackPositionCommandEvent).positionTime
             let cmtime = CMTime(value: CMTimeValue(Float16(time)), timescale: 1)
-            self.avplayer.seek(to: cmtime, toleranceBefore: .indefinite, toleranceAfter: .indefinite)
+            avplayer.seek(to: cmtime, toleranceBefore: .indefinite, toleranceAfter: .indefinite)
             return .success
         }
     }
     
-    func playTrack(track: Track) {
-        self.avplayer.replaceCurrentItem(with: AVPlayerItem(asset: track.asset))
-        self.avplayer.play()
+    func playTrack(track: Track, albumArt: UIImage?, artistName: String?) {
+        avplayer.replaceCurrentItem(with: AVPlayerItem(asset: track.asset))
+        play()
+        
+        // setup Now Playing display
+        var nowPlayingInfo = [String : Any]()
+        nowPlayingInfo[MPMediaItemPropertyTitle] = track.name
+        if let artistName = artistName {
+            nowPlayingInfo[MPMediaItemPropertyArtist] = artistName
+        }
+        if let image = albumArt {
+            nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
+        }
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = avplayer.currentTime().seconds
+        if let duration = track.duration {
+            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration.seconds
+        }
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = Double(1)
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+    
+    private func syncElapsedPlaybackTime() {
+        MPNowPlayingInfoCenter.default()
+            .nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = avplayer.currentTime().seconds
+    }
+    
+    private func play() {
+        avplayer.play()
+        if !syncTimer.isValid {
+            syncTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+                self.syncElapsedPlaybackTime()
+            }
+        }
+    }
+    
+    private func pause() {
+        avplayer.pause()
+        syncTimer.invalidate()
     }
     
 }

@@ -43,8 +43,18 @@ class Track {
     var discNum: Int?
     var trackNum: Int?
     var asset: AVAsset
+    var duration: CMTime?
     
-    init(name: String, artist: ArtistID, album: AlbumID? = nil, genre: String? = nil, discNum: Int? = nil, trackNum: Int? = nil, asset: AVAsset) {
+    init(
+        name: String,
+        artist: ArtistID,
+        album: AlbumID? = nil,
+        genre: String? = nil,
+        discNum: Int? = nil,
+        trackNum: Int? = nil,
+        asset: AVAsset,
+        duration: CMTime? = nil
+    ) {
         self.name = name
         self.artist = artist
         self.album = album
@@ -52,6 +62,7 @@ class Track {
         self.discNum = discNum
         self.trackNum = trackNum
         self.asset = asset
+        self.duration = duration
     }
 }
 
@@ -100,8 +111,6 @@ class MusicLibrary {
             }
             await scanArtistDir(dir: url, artistName: url.lastPathComponent)
         }
-        
-        NotificationCenter.default.post(Notification(name: .musicLibraryUpdated))
     }
     
     private func scanArtistDir(dir: URL, artistName: String) async {
@@ -170,6 +179,8 @@ class MusicLibrary {
             let trackID = self.addTrack(track)
             album.tracks.append(trackID)
         }
+        
+        NotificationCenter.default.post(Notification(name: .musicLibraryUpdated))
     }
     
     private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?) async -> Track {
@@ -183,11 +194,13 @@ class MusicLibrary {
             default: break
             }
         }
+        let duration = try? await asset.load(.duration)
         let track = Track(
             name: name ?? url.lastPathComponent,
             artist: artistID,
             album: albumID,
-            asset: asset
+            asset: asset,
+            duration: duration
         )
         return track
     }

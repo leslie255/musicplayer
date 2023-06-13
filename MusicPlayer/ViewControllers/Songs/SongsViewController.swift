@@ -43,7 +43,9 @@ class SongsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let track = MusicLibrary.shared.tracks[indexPath.row]
-        Player.shared.playTrack(track: track)
+        let albumArt = track.album.map(MusicLibrary.shared.album(forID:))?.art
+        let artistName = MusicLibrary.shared.artist(forID: track.artist).name
+        Player.shared.playTrack(track: track, albumArt: albumArt, artistName: artistName)
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
