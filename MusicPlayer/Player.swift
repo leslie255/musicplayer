@@ -15,19 +15,20 @@ class Player {
     /// Timer for repeatedly sync elapse time in Now Playing
     private var syncTimer = Timer()
     
-    /// Always use `Player.play` and `Player.pause` instead of directly calling `avplayer.play()`/`avplayer.pause()`
     private var avplayer = AVPlayer()
     
-    func setupMPRemoteCommandCenter() {
+    /// Setup the system's Now Playing media controller
+    func setupNowPlaying() {
+        UIApplication.shared.beginReceivingRemoteControlEvents()
         let commandCenter = MPRemoteCommandCenter.shared()
         commandCenter.playCommand.addTarget { [unowned self] event in
             syncElapsedPlaybackTime()
-            play()
+            avplayer.play()
             return .success
         }
         commandCenter.pauseCommand.addTarget { [unowned self] event in
             syncElapsedPlaybackTime()
-            pause()
+            avplayer.pause()
             return .success
         }
         commandCenter.changePlaybackPositionCommand.addTarget { [unowned self] event in
@@ -40,7 +41,7 @@ class Player {
     
     func playTrack(track: Track, albumArt: UIImage?, artistName: String?) {
         avplayer.replaceCurrentItem(with: AVPlayerItem(asset: track.asset))
-        play()
+        avplayer.play()
         
         // setup Now Playing display
         var nowPlayingInfo = [String : Any]()
@@ -62,20 +63,6 @@ class Player {
     private func syncElapsedPlaybackTime() {
         MPNowPlayingInfoCenter.default()
             .nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = avplayer.currentTime().seconds
-    }
-    
-    private func play() {
-        avplayer.play()
-        if !syncTimer.isValid {
-            syncTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
-                self.syncElapsedPlaybackTime()
-            }
-        }
-    }
-    
-    private func pause() {
-        avplayer.pause()
-        syncTimer.invalidate()
     }
     
 }

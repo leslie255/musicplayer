@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             await MusicLibrary.shared.scanMusic()
         }
         
-        Player.shared.setupMPRemoteCommandCenter()
+        Player.shared.setupNowPlaying()
         
         setupAudioSession()
         
