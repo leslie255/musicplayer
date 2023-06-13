@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 class Album {
     var name: String
@@ -38,16 +39,16 @@ class Track {
     var genre: String?
     var discNum: Int?
     var trackNum: Int?
-    let source: URL
+    var asset: AVAsset
     
-    init(name: String, artist: ArtistID, album: AlbumID? = nil, genre: String? = nil, discNum: Int? = nil, trackNum: Int? = nil, source: URL) {
+    init(name: String, artist: ArtistID, album: AlbumID? = nil, genre: String? = nil, discNum: Int? = nil, trackNum: Int? = nil, asset: AVAsset) {
         self.name = name
         self.artist = artist
         self.album = album
         self.genre = genre
         self.discNum = discNum
         self.trackNum = trackNum
-        self.source = source
+        self.asset = asset
     }
 }
 
@@ -80,10 +81,10 @@ class MusicLibrary {
         albums[id.idx]
     }
     
-    func scanMusic() {
+    func scanMusic() async {
         let items: [URL]
         do {
-            items = try FileManager.default.contentsOfDirectory(at: docDir, includingPropertiesForKeys: [.isRegularFileKey, .isReadableKey])
+            items = try FileManager.default.contentsOfDirectory(at: docDir, includingPropertiesForKeys: [.isReadableKey])
         } catch {
             print("Cannot access documents directory")
             return
@@ -94,11 +95,13 @@ class MusicLibrary {
             if artistName.first.map({ $0 == "." }) ?? true {
                 continue
             }
-            scanArtistDir(dir: url, artistName: url.lastPathComponent)
+            await scanArtistDir(dir: url, artistName: url.lastPathComponent)
         }
+        
+        NotificationCenter.default.post(Notification(name: .musicLibraryUpdated))
     }
     
-    private func scanArtistDir(dir: URL, artistName: String) {
+    private func scanArtistDir(dir: URL, artistName: String) async {
         let items: [URL]
         do {
             items = try FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.isReadableKey])
@@ -118,14 +121,16 @@ class MusicLibrary {
             
             if isDir {
                 // is an album
-                self.scanAlbum(url: url, artist: artistID, albumName: albumName)
+                await self.scanAlbum(url: url, artist: artistID, albumName: albumName)
             } else {
                 // is a single
+                let trackID = await self.scanTrack(url: url, artist: artistID, album: nil)
+                self.tracks.append(trackID)
             }
         }
     }
     
-    private func scanAlbum(url: URL, artist artistID: ArtistID, albumName: String) {
+    private func scanAlbum(url: URL, artist artistID: ArtistID, albumName: String) async {
         let items: [URL]
         do {
             items = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isRegularFileKey, .isReadableKey])
@@ -137,19 +142,30 @@ class MusicLibrary {
         let album = Album(name: albumName, artist: artistID, tracks: [], genre: "Unknown Genre")
         let albumID = self.addAlbum(album)
         for trackURL in items {
-            let trackID = self.scanTrack(url: trackURL, artist: artistID, album: albumID)
+            let track = await self.scanTrack(url: trackURL, artist: artistID, album: albumID)
+            let trackID = self.addTrack(track)
             album.tracks.append(trackID)
         }
     }
     
-    private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?) -> TrackID {
+    private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?) async -> Track {
+        let asset = AVAsset(url: url)
+        var name: String? = nil
+        let metadataItems = try? await asset.load(.metadata)
+        for metadata in metadataItems ?? [] {
+            switch metadata.commonKey {
+            case AVMetadataKey.commonKeyTitle:
+                name = try? await metadata.load(.stringValue)
+            default: break
+            }
+        }
         let track = Track(
-            name: url.lastPathComponent,
+            name: name ?? url.lastPathComponent,
             artist: artistID,
             album: albumID,
-            source: url
+            asset: asset
         )
-        return self.addTrack(track: track)
+        return track
     }
     
     private func addArtist(name: String) -> ArtistID {
@@ -165,7 +181,7 @@ class MusicLibrary {
         return AlbumID(idx: idx)
     }
     
-    private func addTrack(track: Track) -> TrackID {
+    private func addTrack(_ track: Track) -> TrackID {
         let idx = tracks.count
         tracks.append(track)
         return TrackID(idx: idx)

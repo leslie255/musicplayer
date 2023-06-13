@@ -9,6 +9,22 @@ import UIKit
 
 class SongsViewController: UITableViewController {
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(reloadTableView),
+            name: .musicLibraryUpdated,
+            object: nil
+        )
+    }
+    
+    @objc func reloadTableView() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         MusicLibrary.shared.tracks.count
     }

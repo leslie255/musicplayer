@@ -15,33 +15,26 @@ class Player {
     private let avplayer = AVPlayer()
     
     func setupMPRemoteCommandCenter() {
-        // Get the shared MPRemoteCommandCenter
         let commandCenter = MPRemoteCommandCenter.shared()
-        // Add handler for Play Command
         commandCenter.playCommand.addTarget { [unowned self] event in
-            if self.avplayer.rate == 0.0 {
-                self.avplayer.play()
-                return .success
-            } else {
-                return .commandFailed
-            }
+            self.avplayer.play()
+            return .success
         }
-        // Add handler for Pause Command
         commandCenter.pauseCommand.addTarget { [unowned self] event in
-            if self.avplayer.rate == 1.0 {
-                self.avplayer.pause()
-                return .success
-            } else {
-                return .commandFailed
-            }
+            self.avplayer.pause()
+            return .success
+        }
+        commandCenter.changePlaybackRateCommand.addTarget { [unowned self] event in
+            let time = (event as! MPChangePlaybackPositionCommandEvent).positionTime
+            let cmtime = CMTime(value: CMTimeValue(Float16(time)), timescale: 1)
+            self.avplayer.seek(to: cmtime, toleranceBefore: .indefinite, toleranceAfter: .indefinite)
+            return .success
         }
     }
     
     func playTrack(track: Track) {
-        // play
-        let asset = AVAsset(url: track.source)
-        self.avplayer.replaceCurrentItem(with: AVPlayerItem(asset: asset))
+        self.avplayer.replaceCurrentItem(with: AVPlayerItem(asset: track.asset))
         self.avplayer.play()
     }
-
+    
 }

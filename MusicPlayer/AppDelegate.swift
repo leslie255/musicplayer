@@ -12,15 +12,25 @@ import AVFoundation
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        MusicLibrary.shared.scanMusic()
+        
+        Task {
+            await MusicLibrary.shared.scanMusic()
+        }
+        
         Player.shared.setupMPRemoteCommandCenter()
+        
+        setupAudioSession()
+        
+        return true
+    }
+    
+    func setupAudioSession() {
         let audioSession = AVAudioSession.sharedInstance()
         do {
             try audioSession.setCategory(.playback, mode: .default)
         } catch {
             print("Failed to set audio session category")
         }
-        return true
     }
     
     // MARK: UISceneSession Lifecycle
