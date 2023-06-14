@@ -12,3 +12,9 @@ extension Collection {
         return self.indices.contains(index) ? self[index] : nil
     }
 }
+
+extension Array {
+    subscript (unsafe index: Self.Index) -> Self.Element {
+        return self.withUnsafeBufferPointer { $0[index] }
+    }
+}

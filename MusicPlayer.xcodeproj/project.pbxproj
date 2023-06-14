@@ -55,7 +55,7 @@
 		582C951D2A301AD500015F05 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		582C951F2A301AD700015F05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		582C95222A301AD700015F05 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		582C95242A301AD700015F05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		582C95242A301AD700015F05 /* Info.plist */ = {isa = PBXFileReference; explicitFileType = text.xml; path = Info.plist; sourceTree = "<group>"; };
 		582C95292A301AD700015F05 /* MusicPlayerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicPlayerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		582C952D2A301AD700015F05 /* MusicPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerTests.swift; sourceTree = "<group>"; };
 		582C95332A301AD700015F05 /* MusicPlayerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicPlayerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };

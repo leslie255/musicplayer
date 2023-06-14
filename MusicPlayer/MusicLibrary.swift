@@ -72,6 +72,20 @@ struct TrackID  { fileprivate var idx: Int }
 
 class MusicLibrary {
     
+    static let moveFilesHereMessage = """
+Move your music files here in the structure of
+
+Artist/
+    single.mp3
+    Album/
+        _metadata/
+            artwork.png
+        song1.m4a
+        song2.flac
+
+mp3, m4a, flac are all supported!
+album art can be in png, jpg or heic
+"""
     static var shared = MusicLibrary()
     
     var tracks = [Track]()
@@ -81,11 +95,6 @@ class MusicLibrary {
     var tracksByArtist = [Track]()
     var tracksByAlbum = [Track]()
     var tracksByAlphabet = [Track]()
-    
-    private var docDir: URL = {
-        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return urls[0]
-    }()
     
     func track(forID id: TrackID) -> Track {
         tracks[id.idx]
@@ -100,12 +109,17 @@ class MusicLibrary {
     }
     
     func scanMusic() async {
+        let docDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let items: [URL]
         do {
             items = try FileManager.default.contentsOfDirectory(at: docDir, includingPropertiesForKeys: [.isReadableKey])
         } catch {
             print("Cannot access documents directory")
             return
+        }
+        
+        if items.isEmpty {
+            createMessageTxt(at: docDir)
         }
         
         await withTaskGroup(of: Void.self) { group in
@@ -121,16 +135,10 @@ class MusicLibrary {
             NotificationCenter.default.post(Notification(name: .musicLibraryFinishedScanning))
         }
         
-        await withTaskGroup(of: Void.self) { group in
-            group.addTask { [self] in
-                tracksByArtist = tracks.sorted { $0.artist.idx > $1.artist.idx }
-                tracksByAlbum = tracks.sorted { ($0.album?.idx ?? -1) > ($1.album?.idx ?? -1) }
-                tracksByAlphabet = tracks.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
-            }
-            
-            for await _ in group {}
-            NotificationCenter.default.post(Notification(name: .musicLibraryFinishedSorting))
-        }
+        tracksByArtist = tracks.sorted { $0.artist.idx > $1.artist.idx }
+        tracksByAlbum = tracks.sorted { ($0.album?.idx ?? -1) > ($1.album?.idx ?? -1) }
+        tracksByAlphabet = tracks.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
+        NotificationCenter.default.post(Notification(name: .musicLibraryFinishedSorting))
         
     }
     
@@ -196,7 +204,15 @@ class MusicLibrary {
             case "mp3", "flac", "m4a": break
             default: continue
             }
-            let track = await self.scanTrack(url: trackURL, artist: artistID, album: albumID)
+            let track: Track
+            if album.art == nil {
+                let (_track, artwork) = await self.scanTrackWithArtwork(url: trackURL, artist: artistID, album: albumID)
+                album.art = artwork
+                track = _track
+            } else {
+                let _track = await self.scanTrack(url: trackURL, artist: artistID, album: albumID)
+                track = _track
+            }
             let trackID = self.addTrack(track)
             album.tracks.append(trackID)
         }
@@ -204,7 +220,7 @@ class MusicLibrary {
     
     private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?) async -> Track {
         let asset = AVAsset(url: url)
-        var name: String? = nil
+        var name: String?
         let metadataItems = try? await asset.load(.metadata)
         for metadata in metadataItems ?? [] {
             switch metadata.commonKey {
@@ -222,6 +238,32 @@ class MusicLibrary {
             duration: duration
         )
         return track
+    }
+    
+    private func scanTrackWithArtwork(url: URL, artist artistID: ArtistID, album albumID: AlbumID?) async -> (Track, UIImage?) {
+        let asset = AVAsset(url: url)
+        var name: String?
+        var artwork: UIImage?
+        let metadataItems = try? await asset.load(.metadata)
+        for metadata in metadataItems ?? [] {
+            switch metadata.commonKey {
+            case AVMetadataKey.commonKeyTitle:
+                name = try? await metadata.load(.stringValue)
+            case AVMetadataKey.commonKeyArtwork:
+                let data = try? await metadata.load(.dataValue)
+                artwork = data.flatMap(UIImage.init(data:))
+            default: break
+            }
+        }
+        let duration = try? await asset.load(.duration)
+        let track = Track(
+            name: name ?? url.lastPathComponent,
+            artist: artistID,
+            album: albumID,
+            asset: asset,
+            duration: duration
+        )
+        return (track, artwork)
     }
     
     private func addArtist(name: String) -> ArtistID {
@@ -243,4 +285,10 @@ class MusicLibrary {
         return TrackID(idx: idx)
     }
     
+    private func createMessageTxt(at dir: URL) {
+        let path = dir.appendingPathComponent("move files here.txt", conformingTo: .fileURL).absoluteString
+        FileManager.default.createFile(
+            atPath: path,
+            contents: MusicLibrary.moveFilesHereMessage.data(using: .utf8))
+    }
 }
