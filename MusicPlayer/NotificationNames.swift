@@ -8,5 +8,8 @@
 import Foundation
 
 extension Notification.Name {
-    static let musicLibraryUpdated = Notification.Name("musicLibraryUpdated")
+    /// Pushed when the music library finished scanning
+    static let musicLibraryFinishedScanning = Notification.Name("musicLibraryFinishedScanning")
+    /// Pushed when the music library finished sorting
+    static let musicLibraryFinishedSorting = Notification.Name("musicLibraryFinishedScanning")
 }

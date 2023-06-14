@@ -17,7 +17,7 @@ class SongsTrackCell: UITableViewCell {
     @IBOutlet weak var artistLabel: UILabel!
     
     func setupLayers() {
-        self.albumArtView.layer.cornerRadius = 4.0
+        self.albumArtView.layer.cornerRadius = 6.0
         self.albumArtView.backgroundColor = .secondarySystemFill
     }
     

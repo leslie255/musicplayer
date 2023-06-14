@@ -66,9 +66,9 @@ class Track {
     }
 }
 
-struct ArtistID { var idx: Int }
-struct AlbumID  { var idx: Int }
-struct TrackID  { var idx: Int }
+struct ArtistID { fileprivate var idx: Int }
+struct AlbumID  { fileprivate var idx: Int }
+struct TrackID  { fileprivate var idx: Int }
 
 class MusicLibrary {
     
@@ -77,6 +77,10 @@ class MusicLibrary {
     var tracks = [Track]()
     var albums = [Album]()
     var artists = [Artist]()
+    
+    var tracksByArtist = [Track]()
+    var tracksByAlbum = [Track]()
+    var tracksByAlphabet = [Track]()
     
     private var docDir: URL = {
         let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
@@ -104,13 +108,30 @@ class MusicLibrary {
             return
         }
         
-        for url in items {
-            let artistName = url.lastPathComponent
-            if artistName.first.map({ $0 == "." }) ?? true {
-                continue
+        await withTaskGroup(of: Void.self) { group in
+            for url in items {
+                let artistName = url.lastPathComponent
+                if artistName.first.map({ $0 == "." }) ?? true {
+                    continue
+                }
+                group.addTask { await self.scanArtistDir(dir: url, artistName: url.lastPathComponent) }
             }
-            await scanArtistDir(dir: url, artistName: url.lastPathComponent)
+            
+            for await _ in group {}
+            NotificationCenter.default.post(Notification(name: .musicLibraryFinishedScanning))
         }
+        
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask { [self] in
+                tracksByArtist = tracks.sorted { $0.artist.idx > $1.artist.idx }
+                tracksByAlbum = tracks.sorted { ($0.album?.idx ?? -1) > ($1.album?.idx ?? -1) }
+                tracksByAlphabet = tracks.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
+            }
+            
+            for await _ in group {}
+            NotificationCenter.default.post(Notification(name: .musicLibraryFinishedSorting))
+        }
+        
     }
     
     private func scanArtistDir(dir: URL, artistName: String) async {
@@ -179,8 +200,6 @@ class MusicLibrary {
             let trackID = self.addTrack(track)
             album.tracks.append(trackID)
         }
-        
-        NotificationCenter.default.post(Notification(name: .musicLibraryUpdated))
     }
     
     private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?) async -> Track {

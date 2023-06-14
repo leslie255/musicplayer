@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -65,7 +66,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Wy-9H-iwA" userLabel="Separator">
-                                            <rect key="frame" x="68" y="56.333333333333336" width="307" height="0.3333333333333357"/>
+                                            <rect key="frame" x="78" y="56.333333333333336" width="297" height="0.3333333333333357"/>
                                             <color key="backgroundColor" systemColor="separatorColor"/>
                                             <rect key="contentStretch" x="0.0" y="0.0" width="1" height="0.5"/>
                                             <constraints>
@@ -73,23 +74,23 @@
                                             </constraints>
                                         </view>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="eIM-si-A5d">
-                                            <rect key="frame" x="20" y="8.3333333333333357" width="40" height="40"/>
+                                            <rect key="frame" x="20" y="3.3333333333333321" width="50" height="50"/>
                                             <constraints>
-                                                <constraint firstAttribute="width" constant="40" id="0m9-zB-Bkh"/>
+                                                <constraint firstAttribute="width" constant="50" id="0m9-zB-Bkh"/>
                                                 <constraint firstAttribute="width" secondItem="eIM-si-A5d" secondAttribute="height" multiplier="1:1" id="fdK-fo-wRS"/>
                                             </constraints>
                                         </imageView>
                                         <stackView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="ixg-J0-FEL">
-                                            <rect key="frame" x="68" y="8" width="307" height="40.666666666666664"/>
+                                            <rect key="frame" x="78" y="8" width="297" height="40.666666666666664"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Track Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="95t-6b-1Hk">
-                                                    <rect key="frame" x="0.0" y="0.0" width="307" height="20.333333333333332"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="297" height="20.333333333333332"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="05H-MR-Zao">
-                                                    <rect key="frame" x="0.0" y="20.333333333333336" width="307" height="20.333333333333336"/>
+                                                    <rect key="frame" x="0.0" y="20.333333333333336" width="297" height="20.333333333333336"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                                     <color key="textColor" systemColor="secondaryLabelColor"/>
                                                     <nil key="highlightedColor"/>
@@ -121,7 +122,20 @@
                             <outlet property="delegate" destination="Ky2-Qb-AXg" id="0Mq-PV-jYe"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Songs" id="jEc-eP-Ly3"/>
+                    <navigationItem key="navigationItem" title="Songs" id="jEc-eP-Ly3">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="s6I-kN-tA2">
+                            <imageReference key="image" image="arrow.up.arrow.down.circle.fill" catalog="system" symbolScale="default" renderingMode="hierarchical">
+                                <hierarchicalColors>
+                                    <color systemColor="systemPinkColor"/>
+                                    <color systemColor="secondaryLabelColor"/>
+                                    <color systemColor="secondarySystemFillColor"/>
+                                </hierarchicalColors>
+                            </imageReference>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="sortButton" destination="s6I-kN-tA2" id="BCE-VL-6Ak"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="K3n-tr-Fre" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -375,12 +389,16 @@
         </scene>
     </scenes>
     <resources>
+        <image name="arrow.up.arrow.down.circle.fill" catalog="system" width="128" height="123"/>
         <image name="guitars.fill" catalog="system" width="128" height="98"/>
         <image name="music.mic" catalog="system" width="128" height="119"/>
         <image name="music.note" catalog="system" width="96" height="128"/>
         <image name="square.stack.fill" catalog="system" width="112" height="128"/>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="secondarySystemFillColor">
+            <color red="0.47058823529411764" green="0.47058823529411764" blue="0.50196078431372548" alpha="0.16" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="separatorColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.28999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
