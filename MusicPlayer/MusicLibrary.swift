@@ -72,7 +72,7 @@ struct TrackID  { fileprivate var idx: Int }
 
 class MusicLibrary {
     
-    static let moveFilesHereMessage = """
+    static private let moveFilesHereMessage = """
 Move your music files here in the structure of
 
 Artist/
@@ -94,7 +94,7 @@ album art can be in png, jpg or heic
     
     var tracksByArtist = [Track]()
     var tracksByAlbum = [Track]()
-    var tracksByAlphabet = [Track]()
+    var tracksByTitle = [Track]()
     
     func track(forID id: TrackID) -> Track {
         tracks[id.idx]
@@ -110,7 +110,7 @@ album art can be in png, jpg or heic
     
     func scanMusic() async {
         let docDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let items: [URL]
+        var items: [URL]
         do {
             items = try FileManager.default.contentsOfDirectory(at: docDir, includingPropertiesForKeys: [.isReadableKey])
         } catch {
@@ -135,11 +135,19 @@ album art can be in png, jpg or heic
             NotificationCenter.default.post(Notification(name: .musicLibraryFinishedScanning))
         }
         
-        tracksByArtist = tracks.sorted { $0.artist.idx > $1.artist.idx }
-        tracksByAlbum = tracks.sorted { ($0.album?.idx ?? -1) > ($1.album?.idx ?? -1) }
-        tracksByAlphabet = tracks.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
-        NotificationCenter.default.post(Notification(name: .musicLibraryFinishedSorting))
+        tracksByArtist = tracks.sorted { [self] (track0, track1) in
+            let artistName0 = artist(forID: track0.artist).name
+            let artistName1 = artist(forID: track1.artist).name
+            return artistName0.caseInsensitiveCompare(artistName1) == .orderedAscending
+        }
+        tracksByAlbum = tracks.sorted { [self] (track0, track1) in
+            let albumName0 = track0.album.map(album(forID:))?.name ?? track0.name
+            let albumName1 = track1.album.map(album(forID:))?.name ?? track1.name
+            return albumName0.caseInsensitiveCompare(albumName1) == .orderedAscending
+        }
+        tracksByTitle = tracks.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
         
+        NotificationCenter.default.post(Notification(name: .musicLibraryFinishedSorting))
     }
     
     private func scanArtistDir(dir: URL, artistName: String) async {

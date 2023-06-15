@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		580E99EC2A32812E00F8211A /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580E99EB2A32812E00F8211A /* Utils.swift */; };
+		581926412A3B285A0055271B /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581926402A3B285A0055271B /* TabBarController.swift */; };
 		582C95172A301AD500015F05 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582C95162A301AD500015F05 /* AppDelegate.swift */; };
 		582C95192A301AD500015F05 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582C95182A301AD500015F05 /* SceneDelegate.swift */; };
 		582C951E2A301AD500015F05 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 582C951C2A301AD500015F05 /* Main.storyboard */; };
@@ -49,6 +50,7 @@
 
 /* Begin PBXFileReference section */
 		580E99EB2A32812E00F8211A /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		581926402A3B285A0055271B /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		582C95132A301AD500015F05 /* MusicPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		582C95162A301AD500015F05 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		582C95182A301AD500015F05 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				582C95162A301AD500015F05 /* AppDelegate.swift */,
 				582C95182A301AD500015F05 /* SceneDelegate.swift */,
 				586042DB2A312A380080CEB1 /* MusicLibrary.swift */,
+				581926402A3B285A0055271B /* TabBarController.swift */,
 				5846DEA62A37F551000455B2 /* NotificationNames.swift */,
 				5846DEA42A374A7C000455B2 /* Player.swift */,
 				58B94CE52A302CAB00D11463 /* ViewControllers */,
@@ -338,6 +341,7 @@
 				582C954D2A30225A00015F05 /* ArtistsVC.swift in Sources */,
 				580E99EC2A32812E00F8211A /* Utils.swift in Sources */,
 				5846DEA72A37F551000455B2 /* NotificationNames.swift in Sources */,
+				581926412A3B285A0055271B /* TabBarController.swift in Sources */,
 				585EB02B2A309E6D003F0066 /* AlbumBannerCell.swift in Sources */,
 				585EB02E2A30EE01003F0066 /* AlbumsViewController.swift in Sources */,
 				582C95492A30220100015F05 /* SongsViewController.swift in Sources */,

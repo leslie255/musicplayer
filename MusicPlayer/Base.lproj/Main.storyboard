@@ -14,7 +14,7 @@
         <!--Tab Bar Controller-->
         <scene sceneID="RvZ-kh-hFE">
             <objects>
-                <tabBarController id="HcB-ci-V1g" sceneMemberID="viewController">
+                <tabBarController id="HcB-ci-V1g" customClass="TabBarController" customModule="MusicPlayer" customModuleProvider="target" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="G6s-7c-0HR">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>

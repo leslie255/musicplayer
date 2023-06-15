@@ -9,9 +9,28 @@ import UIKit
 
 class SongsViewController: UITableViewController, UISearchBarDelegate {
     
+    private enum SongsSortMode {
+        case random, byArtist, byAlbum, byTitle
+    }
+    
     @IBOutlet weak var sortButton: UIBarButtonItem!
     
     let searchController = UISearchController(searchResultsController: nil)
+    
+    private var sortMode: SongsSortMode = .random {
+        didSet {
+            switch sortMode {
+            case .random:
+                presentedTracks = MusicLibrary.shared.tracks
+            case .byArtist:
+                presentedTracks = MusicLibrary.shared.tracksByArtist
+            case .byAlbum:
+                presentedTracks = MusicLibrary.shared.tracksByAlbum
+            case .byTitle:
+                presentedTracks = MusicLibrary.shared.tracksByTitle
+            }
+        }
+    }
     
     /// Text in the search bar, `nil` if search bar isn't active
     var searchText: String?
@@ -76,16 +95,28 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     }
     
     private func setupSortButton() {
-        let actionArtist = UIAction(title: "Artist", image: UIImage(systemName: "music.mic")) { [self] _ in
-            presentedTracks = MusicLibrary.shared.tracksByArtist
+        let actionArtist = UIAction(
+            title: "Artist",
+            image: UIImage(systemName: "music.mic"),
+            state: sortMode == .byArtist ? .on : .off
+        ) { [self] _ in
+            sortMode = .byAlbum
             tableView.reloadData()
         }
-        let actionAlbum = UIAction(title: "Album", image: UIImage(systemName: "square.stack.fill")) { [self] _ in
-            presentedTracks = MusicLibrary.shared.tracksByArtist
+        let actionAlbum = UIAction(
+            title: "Album",
+            image: UIImage(systemName: "square.stack.fill"),
+            state: sortMode == .byAlbum ? .on : .off
+        ) { [self] _ in
+            sortMode = .byArtist
             tableView.reloadData()
         }
-        let actionTitle = UIAction(title: "Title", image: UIImage(systemName: "square.stack.fill")) { [self] _ in
-            presentedTracks = MusicLibrary.shared.tracksByAlphabet
+        let actionTitle = UIAction(
+            title: "Title",
+            image: UIImage(systemName: "square.stack.fill"),
+            state: sortMode == .byTitle ? .on : .off
+        ) { [self] _ in
+            sortMode = .byTitle
             tableView.reloadData()
         }
         let menu = UIMenu(title: "Sort by", children: [actionArtist, actionAlbum, actionTitle])
@@ -101,7 +132,7 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     
     @objc private func libraryFinishedSorting() {
         // UITableView.reloadData must be called in the main thread
-        presentedTracks = MusicLibrary.shared.tracksByAlbum
+        presentedTracks = MusicLibrary.shared.tracksByArtist
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
