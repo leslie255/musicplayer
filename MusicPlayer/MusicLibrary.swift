@@ -108,6 +108,18 @@ album art can be in png, jpg or heic
         albums[id.idx]
     }
     
+    func track(forOptionalID id: TrackID?) -> Track? {
+        id.map(track(forID:))
+    }
+    
+    func artist(forOptionalID id: ArtistID?) -> Artist? {
+        id.map(artist(forID:))
+    }
+    
+    func album(forOptionalID id: AlbumID?) -> Album? {
+        id.map(album(forID:))
+    }
+    
     func scanMusic() async {
         let docDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         var items: [URL]
@@ -122,13 +134,15 @@ album art can be in png, jpg or heic
             createMessageTxt(at: docDir)
         }
         
+        artists.reserveCapacity(items.count)
+        
         await withTaskGroup(of: Void.self) { group in
             for url in items {
                 let artistName = url.lastPathComponent
                 if artistName.first.map({ $0 == "." }) ?? true {
                     continue
                 }
-                group.addTask { await self.scanArtistDir(dir: url, artistName: url.lastPathComponent) }
+                group.addTask { [self] in await scanArtistDir(dir: url, artistName: url.lastPathComponent) }
             }
             
             for await _ in group {}
@@ -159,7 +173,9 @@ album art can be in png, jpg or heic
             return
         }
         
-        let artistID = self.addArtist(name: artistName)
+        albums.reserveCapacity(items.count)
+        
+        let artistID = addArtist(name: artistName)
         for url in items {
             let albumName = url.lastPathComponent
             if albumName.first.map({ $0 == "." }) ?? true {
@@ -170,11 +186,11 @@ album art can be in png, jpg or heic
             
             if isDir {
                 // is an album
-                await self.scanAlbum(url: url, artist: artistID, albumName: albumName)
+                await scanAlbum(url: url, artist: artistID, albumName: albumName)
             } else {
                 // is a single
-                let trackID = await self.scanTrack(url: url, artist: artistID, album: nil)
-                self.tracks.append(trackID)
+                let track = await scanTrack(url: url, artist: artistID, album: nil)
+                addTrack(track)
             }
         }
     }
@@ -206,7 +222,7 @@ album art can be in png, jpg or heic
         }
         
         let album = Album(name: albumName, artist: artistID, tracks: [], art: albumArt, genre: "Unknown Genre")
-        let albumID = self.addAlbum(album)
+        let albumID = addAlbum(album)
         for trackURL in items {
             switch trackURL.pathExtension {
             case "mp3", "flac", "m4a": break
@@ -214,14 +230,14 @@ album art can be in png, jpg or heic
             }
             let track: Track
             if album.art == nil {
-                let (_track, artwork) = await self.scanTrackWithArtwork(url: trackURL, artist: artistID, album: albumID)
+                let (_track, artwork) = await scanTrackWithArtwork(url: trackURL, artist: artistID, album: albumID)
                 album.art = artwork
                 track = _track
             } else {
-                let _track = await self.scanTrack(url: trackURL, artist: artistID, album: albumID)
+                let _track = await scanTrack(url: trackURL, artist: artistID, album: albumID)
                 track = _track
             }
-            let trackID = self.addTrack(track)
+            let trackID = addTrack(track)
             album.tracks.append(trackID)
         }
     }
@@ -287,6 +303,7 @@ album art can be in png, jpg or heic
         return AlbumID(idx: idx)
     }
     
+    @discardableResult
     private func addTrack(_ track: Track) -> TrackID {
         let idx = tracks.count
         tracks.append(track)

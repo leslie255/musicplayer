@@ -13,9 +13,9 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
         case random, byArtist, byAlbum, byTitle
     }
     
-    @IBOutlet weak var sortButton: UIBarButtonItem!
+    @IBOutlet private weak var sortButton: UIBarButtonItem!
     
-    let searchController = UISearchController(searchResultsController: nil)
+    private let searchController = UISearchController(searchResultsController: nil)
     
     private var sortMode: SongsSortMode = .random {
         didSet {
@@ -29,22 +29,23 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
             case .byTitle:
                 presentedTracks = MusicLibrary.shared.tracksByTitle
             }
+            syncSortModeMenu()
         }
     }
     
     /// Text in the search bar, `nil` if search bar isn't active
-    var searchText: String?
+    private var searchText: String?
     
     /// The tracks presented inside this VC, "points"
-    var presentedTracks = MusicLibrary.shared.tracks
+    private var presentedTracks = MusicLibrary.shared.tracks
     
     /// Tracks filtered by `searchText`
-    var filteredTracks = [Track]()
+    private var filteredTracks = [Track]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         searchController.searchBar.placeholder = "Search in Songs"
-        setupSortButton()
+        syncSortModeMenu()
         self.navigationItem.searchController = searchController
         self.navigationItem.hidesSearchBarWhenScrolling = false
         NotificationCenter.default.addObserver(
@@ -77,7 +78,7 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SongsTrackCell", for: indexPath) as! SongsTrackCell
         let track = presentedTracks[indexPath.row]
-        let album = track.album.map(MusicLibrary.shared.album(forID:))
+        let album = MusicLibrary.shared.album(forOptionalID: track.album)
         cell.setupLayers()
         cell.trackLabel.text = track.name
         cell.artistLabel.text = MusicLibrary.shared.artist(forID: track.artist).name
@@ -88,32 +89,30 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let track = presentedTracks[indexPath.row]
-        let albumArt = track.album.map(MusicLibrary.shared.album(forID:))?.art
+        let albumArt = MusicLibrary.shared.album(forOptionalID: track.album)?.art
         let artistName = MusicLibrary.shared.artist(forID: track.artist).name
         Player.shared.playTrack(track: track, albumArt: albumArt, artistName: artistName)
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    private func setupSortButton() {
+    /// Sync the selection of the sort menu
+    private func syncSortModeMenu() {
         let actionArtist = UIAction(
             title: "Artist",
-            image: UIImage(systemName: "music.mic"),
             state: sortMode == .byArtist ? .on : .off
-        ) { [self] _ in
-            sortMode = .byAlbum
-            tableView.reloadData()
-        }
-        let actionAlbum = UIAction(
-            title: "Album",
-            image: UIImage(systemName: "square.stack.fill"),
-            state: sortMode == .byAlbum ? .on : .off
         ) { [self] _ in
             sortMode = .byArtist
             tableView.reloadData()
         }
+        let actionAlbum = UIAction(
+            title: "Album",
+            state: sortMode == .byAlbum ? .on : .off
+        ) { [self] _ in
+            sortMode = .byAlbum
+            tableView.reloadData()
+        }
         let actionTitle = UIAction(
             title: "Title",
-            image: UIImage(systemName: "square.stack.fill"),
             state: sortMode == .byTitle ? .on : .off
         ) { [self] _ in
             sortMode = .byTitle
@@ -132,7 +131,7 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     
     @objc private func libraryFinishedSorting() {
         // UITableView.reloadData must be called in the main thread
-        presentedTracks = MusicLibrary.shared.tracksByArtist
+        sortMode = .byArtist
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
