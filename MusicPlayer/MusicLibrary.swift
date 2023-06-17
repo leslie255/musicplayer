@@ -189,7 +189,7 @@ album art can be in png, jpg or heic
                 await scanAlbum(url: url, artist: artistID, albumName: albumName)
             } else {
                 // is a single
-                let track = await scanTrack(url: url, artist: artistID, album: nil)
+                let (track, _) = await scanTrack(url: url, artist: artistID, album: nil, includeArtwork: false)
                 addTrack(track)
             }
         }
@@ -230,11 +230,11 @@ album art can be in png, jpg or heic
             }
             let track: Track
             if album.art == nil {
-                let (_track, artwork) = await scanTrackWithArtwork(url: trackURL, artist: artistID, album: albumID)
+                let (_track, artwork) = await scanTrack(url: trackURL, artist: artistID, album: albumID, includeArtwork: true)
                 album.art = artwork
                 track = _track
             } else {
-                let _track = await scanTrack(url: trackURL, artist: artistID, album: albumID)
+                let (_track, _) = await scanTrack(url: trackURL, artist: artistID, album: albumID, includeArtwork: false)
                 track = _track
             }
             let trackID = addTrack(track)
@@ -242,48 +242,30 @@ album art can be in png, jpg or heic
         }
     }
     
-    private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?) async -> Track {
-        let asset = AVAsset(url: url)
-        var name: String?
-        let metadataItems = try? await asset.load(.metadata)
-        for metadata in metadataItems ?? [] {
-            switch metadata.commonKey {
-            case AVMetadataKey.commonKeyTitle:
-                name = try? await metadata.load(.stringValue)
-            default: break
-            }
-        }
-        let duration = try? await asset.load(.duration)
-        let track = Track(
-            name: name ?? url.lastPathComponent,
-            artist: artistID,
-            album: albumID,
-            asset: asset,
-            duration: duration
-        )
-        return track
-    }
-    
-    private func scanTrackWithArtwork(url: URL, artist artistID: ArtistID, album albumID: AlbumID?) async -> (Track, UIImage?) {
+    private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?, includeArtwork: Bool) async -> (Track, UIImage?) {
         let asset = AVAsset(url: url)
         var name: String?
         var artwork: UIImage?
         let metadataItems = try? await asset.load(.metadata)
+        let fileName = url.lastPathComponent
         for metadata in metadataItems ?? [] {
             switch metadata.commonKey {
             case AVMetadataKey.commonKeyTitle:
                 name = try? await metadata.load(.stringValue)
             case AVMetadataKey.commonKeyArtwork:
-                let data = try? await metadata.load(.dataValue)
-                artwork = data.flatMap(UIImage.init(data:))
+                if includeArtwork {
+                    let data = try? await metadata.load(.dataValue)
+                    artwork = data.flatMap(UIImage.init(data:))
+                }
             default: break
             }
         }
         let duration = try? await asset.load(.duration)
         let track = Track(
-            name: name ?? url.lastPathComponent,
+            name: name ?? fileName,
             artist: artistID,
             album: albumID,
+            trackNum: nil,  // TODO
             asset: asset,
             duration: duration
         )

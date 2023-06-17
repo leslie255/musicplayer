@@ -20,9 +20,11 @@ class AlbumBannerCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
     }
     
-    func setupLayer() {
-        self.albumArtView.layer.cornerRadius = 16
-        self.albumArtView.layer.backgroundColor = UIColor.secondarySystemFill.cgColor
+    override func didMoveToSuperview() {
+        self.albumArtView.layer.cornerRadius = 12
+        self.albumArtView.layer.borderWidth = 0.5
+        self.albumArtView.layer.borderColor = UIColor.secondarySystemFill.cgColor
+        self.albumArtView.backgroundColor = .secondarySystemFill
     }
 
 }

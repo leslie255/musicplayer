@@ -14,7 +14,7 @@
         <!--Tab Bar Controller-->
         <scene sceneID="RvZ-kh-hFE">
             <objects>
-                <tabBarController id="HcB-ci-V1g" customClass="TabBarController" customModule="MusicPlayer" customModuleProvider="target" sceneMemberID="viewController">
+                <tabBarController id="HcB-ci-V1g" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="G6s-7c-0HR">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -246,15 +246,19 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Track Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vnm-ep-Fp4">
-                                            <rect key="frame" x="52" y="11.999999999999998" width="303" height="20.333333333333329"/>
+                                            <rect key="frame" x="52" y="0.0" width="303" height="44"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="44" id="oX7-Ng-l6W"/>
+                                            </constraints>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qCJ-1A-Nuo">
-                                            <rect key="frame" x="20" y="11.999999999999998" width="24" height="20.333333333333329"/>
+                                            <rect key="frame" x="20" y="0.0" width="24" height="44"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="24" id="ZTb-53-aMF"/>
+                                                <constraint firstAttribute="height" constant="44" id="pSs-FO-iBz"/>
                                             </constraints>
                                             <fontDescription key="fontDescription" type="system" weight="medium" pointSize="17"/>
                                             <color key="textColor" systemColor="secondaryLabelColor"/>
@@ -329,34 +333,57 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <color key="tintColor" systemColor="systemPinkColor"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="edr-Zf-7ja">
-                            <size key="itemSize" width="128" height="128"/>
+                            <size key="itemSize" width="128" height="174"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>
                             <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                         </collectionViewFlowLayout>
                         <cells>
                             <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="AlbumsCell" id="h8N-5m-tAN" customClass="AlbumsCell" customModule="MusicPlayer" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                <rect key="frame" x="0.0" y="0.0" width="128" height="170"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="fIq-Fc-1Tn">
-                                    <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="128" height="170"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Ftx-yr-P1a">
                                             <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                                             <color key="tintColor" systemColor="systemFillColor"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" secondItem="Ftx-yr-P1a" secondAttribute="height" multiplier="1:1" id="eKI-be-BKV"/>
+                                            </constraints>
                                         </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Album Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="09b-MG-VY8">
+                                            <rect key="frame" x="0.0" y="132" width="128" height="18"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ip-RP-ggi">
+                                            <rect key="frame" x="0.0" y="150" width="128" height="18"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="Ftx-yr-P1a" firstAttribute="top" secondItem="fIq-Fc-1Tn" secondAttribute="top" id="494-gD-2Qb"/>
-                                        <constraint firstAttribute="trailing" secondItem="Ftx-yr-P1a" secondAttribute="trailing" id="4y3-kt-Hgv"/>
-                                        <constraint firstAttribute="bottom" secondItem="Ftx-yr-P1a" secondAttribute="bottom" id="DhY-Fh-fnL"/>
-                                        <constraint firstItem="Ftx-yr-P1a" firstAttribute="leading" secondItem="fIq-Fc-1Tn" secondAttribute="leading" id="id3-Og-Yaq"/>
+                                        <constraint firstItem="9ip-RP-ggi" firstAttribute="leading" secondItem="fIq-Fc-1Tn" secondAttribute="leading" id="3Wg-9i-HlR"/>
+                                        <constraint firstAttribute="trailing" secondItem="9ip-RP-ggi" secondAttribute="trailing" id="5RS-Oc-5Yd"/>
+                                        <constraint firstAttribute="trailing" secondItem="09b-MG-VY8" secondAttribute="trailing" id="5h8-mN-6Zx"/>
+                                        <constraint firstItem="09b-MG-VY8" firstAttribute="leading" secondItem="fIq-Fc-1Tn" secondAttribute="leading" id="7oM-51-Am4"/>
+                                        <constraint firstItem="9ip-RP-ggi" firstAttribute="top" secondItem="09b-MG-VY8" secondAttribute="bottom" id="BMR-UN-Ovf"/>
+                                        <constraint firstItem="Ftx-yr-P1a" firstAttribute="top" secondItem="fIq-Fc-1Tn" secondAttribute="top" id="X61-hv-fcU"/>
+                                        <constraint firstItem="09b-MG-VY8" firstAttribute="top" secondItem="Ftx-yr-P1a" secondAttribute="bottom" constant="4" id="Z6v-0I-4xo"/>
+                                        <constraint firstItem="Ftx-yr-P1a" firstAttribute="leading" secondItem="fIq-Fc-1Tn" secondAttribute="leading" id="hgt-yf-BCd"/>
+                                        <constraint firstAttribute="trailing" secondItem="Ftx-yr-P1a" secondAttribute="trailing" id="pPS-8L-C8t"/>
                                     </constraints>
                                 </collectionViewCellContentView>
                                 <color key="tintColor" systemColor="systemPinkColor"/>
+                                <size key="customSize" width="128" height="170"/>
                                 <connections>
                                     <outlet property="albumArtView" destination="Ftx-yr-P1a" id="t6a-9Y-dnh"/>
+                                    <outlet property="artistLabel" destination="9ip-RP-ggi" id="MHK-NC-joC"/>
+                                    <outlet property="nameLabel" destination="09b-MG-VY8" id="AAP-PG-Xc6"/>
                                 </connections>
                             </collectionViewCell>
                         </cells>

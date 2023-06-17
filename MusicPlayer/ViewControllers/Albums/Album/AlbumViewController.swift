@@ -29,25 +29,32 @@ class AlbumViewController: UITableViewController {
         if indexPath.row == 0 {
             // the banner cell
             return self.banner_cell(
-                image: nil,
+                image: album.art,
                 name: album.name,
                 artist: album.artist,
                 genre: album.genre
             )
         }
         
-        if let trackID = self.album.tracks[checked: indexPath.row - 1] {
-            let track = MusicLibrary.shared.track(forID: trackID)
-            return self.track_cell(num: track.trackNum, name: track.name)
-        } else {
+        guard let trackID = self.album.tracks[checked: indexPath.row - 1] else {
             return self.track_cell(num: 99, name: "Unknown")
         }
+        
+        let track = MusicLibrary.shared.track(forID: trackID)
+        return self.track_cell(num: track.trackNum, name: track.name)
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        defer { tableView.deselectRow(at: indexPath, animated: true) }
+        guard let trackID = self.album.tracks[checked: indexPath.row - 1] else { return }
+        let track = MusicLibrary.shared.track(forID: trackID)
+        let artist = MusicLibrary.shared.artist(forID: album.artist)
+        Player.shared.playTrack(track: track, albumArt: album.art, artistName: artist.name)
     }
     
     private func banner_cell(image: UIImage?, name: String?, artist artistID: ArtistID, genre: String?) -> UITableViewCell {
         let artist = MusicLibrary.shared.artist(forID: artistID)
         let cell = mainTableView.dequeueReusableCell(withIdentifier: "AlbumsBannerCell") as! AlbumBannerCell
-        cell.setupLayer()
         cell.albumArtView.image = image ?? UIImage(systemName: "music.note.list")
         cell.nameLabel.text = name
         cell.artistLabel.text = artist.name

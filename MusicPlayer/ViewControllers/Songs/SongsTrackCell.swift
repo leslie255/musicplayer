@@ -16,8 +16,11 @@ class SongsTrackCell: UITableViewCell {
     
     @IBOutlet weak var artistLabel: UILabel!
     
-    func setupLayers() {
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
         self.albumArtView.layer.cornerRadius = 6.0
+        self.albumArtView.layer.borderWidth = 0.5
+        self.albumArtView.layer.borderColor = UIColor.secondarySystemFill.cgColor
         self.albumArtView.backgroundColor = .secondarySystemFill
     }
     

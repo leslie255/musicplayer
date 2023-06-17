@@ -44,7 +44,7 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        searchController.searchBar.placeholder = "Search in Songs"
+        searchController.searchBar.placeholder = "Find in Songs"
         syncSortModeMenu()
         self.navigationItem.searchController = searchController
         self.navigationItem.hidesSearchBarWhenScrolling = false
@@ -79,7 +79,6 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SongsTrackCell", for: indexPath) as! SongsTrackCell
         let track = presentedTracks[indexPath.row]
         let album = MusicLibrary.shared.album(forOptionalID: track.album)
-        cell.setupLayers()
         cell.trackLabel.text = track.name
         cell.artistLabel.text = MusicLibrary.shared.artist(forID: track.artist).name
         let albumArtImage = album?.art ?? UIImage(systemName: "music.note")

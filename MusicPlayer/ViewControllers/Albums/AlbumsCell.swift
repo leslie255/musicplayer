@@ -12,9 +12,15 @@ class AlbumsCell: UICollectionViewCell {
     
     @IBOutlet weak var albumArtView: UIImageView!
     
-    func setupLayer() {
-        self.layer.cornerRadius = 12.0
-        self.layer.backgroundColor = UIColor.secondarySystemFill.cgColor
+    @IBOutlet weak var nameLabel: UILabel!
+    
+    @IBOutlet weak var artistLabel: UILabel!
+    
+    override func didMoveToSuperview() {
+        self.albumArtView.layer.cornerRadius = 12.0
+        self.albumArtView.layer.borderWidth = 0.5
+        self.albumArtView.layer.borderColor = UIColor.secondarySystemFill.cgColor
+        self.albumArtView.backgroundColor = .secondarySystemFill
     }
     
 }
