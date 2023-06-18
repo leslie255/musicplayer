@@ -92,6 +92,8 @@ album art can be in png, jpg or heic
     var albums = [Album]()
     var artists = [Artist]()
     
+    var albumsByTitle = [Album]()
+    
     var tracksByArtist = [Track]()
     var tracksByAlbum = [Track]()
     var tracksByTitle = [Track]()
@@ -149,16 +151,13 @@ album art can be in png, jpg or heic
             NotificationCenter.default.post(Notification(name: .musicLibraryFinishedScanning))
         }
         
+        albumsByTitle = albums.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
         tracksByArtist = tracks.sorted { [self] (track0, track1) in
             let artistName0 = artist(forID: track0.artist).name
             let artistName1 = artist(forID: track1.artist).name
             return artistName0.caseInsensitiveCompare(artistName1) == .orderedAscending
         }
-        tracksByAlbum = tracks.sorted { [self] (track0, track1) in
-            let albumName0 = track0.album.map(album(forID:))?.name ?? track0.name
-            let albumName1 = track1.album.map(album(forID:))?.name ?? track1.name
-            return albumName0.caseInsensitiveCompare(albumName1) == .orderedAscending
-        }
+        tracksByAlbum = albumsByTitle.flatMap { $0.tracks.map { self.track(forID: $0) } }
         tracksByTitle = tracks.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
         
         NotificationCenter.default.post(Notification(name: .musicLibraryFinishedSorting))
@@ -190,7 +189,7 @@ album art can be in png, jpg or heic
             } else {
                 // is a single
                 let (track, _) = await scanTrack(url: url, artist: artistID, album: nil, includeArtwork: false)
-                addTrack(track)
+                let _ = addTrack(track)
             }
         }
     }
@@ -237,8 +236,23 @@ album art can be in png, jpg or heic
                 let (_track, _) = await scanTrack(url: trackURL, artist: artistID, album: albumID, includeArtwork: false)
                 track = _track
             }
+            
+            // insertion sort tracks by disc and track number
+            let discNum = track.discNum ?? 0
+            let trackNum = track.trackNum ?? 0
             let trackID = addTrack(track)
-            album.tracks.append(trackID)
+            let insert_idx = album.tracks
+                .enumerated()
+                .first { (i, trackID) in
+                    let track = self.track(forID: trackID)
+                    return discNum <= track.discNum ?? 0 && trackNum <= track.trackNum ?? 0
+                }
+                .map { $0.0 }
+            if let insert_idx {
+                album.tracks.insert(trackID, at: insert_idx)
+            } else {
+                album.tracks.append(trackID)
+            }
         }
     }
     
@@ -261,15 +275,34 @@ album art can be in png, jpg or heic
             }
         }
         let duration = try? await asset.load(.duration)
+        let (discNum, trackNum) = getDiscAndTrackName(fileName: fileName)
         let track = Track(
             name: name ?? fileName,
             artist: artistID,
             album: albumID,
-            trackNum: nil,  // TODO
+            discNum: discNum,
+            trackNum: trackNum,
             asset: asset,
             duration: duration
         )
         return (track, artwork)
+    }
+    
+    private func getDiscAndTrackName(fileName: String) -> (Int?, Int?) {
+        func charAsDigit(char: UInt32) -> UInt32? {
+            let digit = char &- 0x30
+            return digit < 10 ? digit : nil
+        }
+        var chars = fileName.unicodeScalars.makeIterator()
+        guard let digit0 = chars.next().map(UInt32.init(_:)).flatMap(charAsDigit(char:)) else { return (nil, nil) }
+        guard let char1 = chars.next() else { return (nil, nil) }
+        if let digit1 = charAsDigit(char: UInt32(char1)) { return (nil, Int(digit0 * 10 + digit1)) }
+        if char1 != "-" { return (nil, nil) }
+        let discNum = digit0
+        guard let digit2 = chars.next().map(UInt32.init(_:)).flatMap(charAsDigit(char:)) else { return (nil, nil) }
+        guard let digit3 = chars.next().map(UInt32.init(_:)).flatMap(charAsDigit(char:)) else { return (nil, nil) }
+        let trackNum = digit2 * 10 + digit3
+        return (Int(discNum), Int(trackNum))
     }
     
     private func addArtist(name: String) -> ArtistID {
@@ -285,7 +318,6 @@ album art can be in png, jpg or heic
         return AlbumID(idx: idx)
     }
     
-    @discardableResult
     private func addTrack(_ track: Track) -> TrackID {
         let idx = tracks.count
         tracks.append(track)

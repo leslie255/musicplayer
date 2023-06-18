@@ -71,6 +71,10 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
         tableView.reloadData()
     }
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        57
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         presentedTracks.count
     }
