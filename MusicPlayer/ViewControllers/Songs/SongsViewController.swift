@@ -84,7 +84,15 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
         let track = presentedTracks[indexPath.row]
         let album = MusicLibrary.shared.album(forOptionalID: track.album)
         cell.trackLabel.text = track.name
-        cell.artistLabel.text = MusicLibrary.shared.artist(forID: track.artist).name
+        if sortMode == .byAlbum {
+            cell.artistLabel.text = String(
+                format: "%@ - %@",
+                MusicLibrary.shared.artist(forID: track.artist).name,
+                MusicLibrary.shared.album(forOptionalID: track.album)?.name ?? "Single"
+            )
+        } else {
+            cell.artistLabel.text = MusicLibrary.shared.artist(forID: track.artist).name
+        }
         let albumArtImage = album?.art ?? UIImage(systemName: "music.note")
         cell.albumArtView.image = albumArtImage
         return cell

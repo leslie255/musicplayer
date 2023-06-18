@@ -28,6 +28,7 @@ class Album {
 class Artist {
     var name: String
     var albums: [AlbumID]
+    // TODO: Singles
     
     init(name: String, albums: [AlbumID]) {
         self.name = name
@@ -92,6 +93,8 @@ album art can be in png, jpg or heic
     var albums = [Album]()
     var artists = [Artist]()
     
+    var artistsByTitle = [Artist]()
+    
     var albumsByTitle = [Album]()
     
     var tracksByArtist = [Track]()
@@ -151,12 +154,9 @@ album art can be in png, jpg or heic
             NotificationCenter.default.post(Notification(name: .musicLibraryFinishedScanning))
         }
         
+        artistsByTitle = artists.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
         albumsByTitle = albums.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
-        tracksByArtist = tracks.sorted { [self] (track0, track1) in
-            let artistName0 = artist(forID: track0.artist).name
-            let artistName1 = artist(forID: track1.artist).name
-            return artistName0.caseInsensitiveCompare(artistName1) == .orderedAscending
-        }
+        tracksByArtist = artistsByTitle.flatMap { $0.albums }.map(album(forID:)).flatMap { $0.tracks }.map(track(forID:))
         tracksByAlbum = albumsByTitle.flatMap { $0.tracks.map { self.track(forID: $0) } }
         tracksByTitle = tracks.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
         
@@ -174,7 +174,9 @@ album art can be in png, jpg or heic
         
         albums.reserveCapacity(items.count)
         
-        let artistID = addArtist(name: artistName)
+        let artist = Artist(name: artistName, albums: [])
+        let artistID = addArtist(artist)
+        
         for url in items {
             let albumName = url.lastPathComponent
             if albumName.first.map({ $0 == "." }) ?? true {
@@ -185,16 +187,15 @@ album art can be in png, jpg or heic
             
             if isDir {
                 // is an album
-                await scanAlbum(url: url, artist: artistID, albumName: albumName)
+                await scanAlbum(url: url, artist: artistID, albumName: albumName).map { artist.albums.append($0) }
             } else {
                 // is a single
-                let (track, _) = await scanTrack(url: url, artist: artistID, album: nil, includeArtwork: false)
-                let _ = addTrack(track)
+                // TODO
             }
         }
     }
     
-    private func scanAlbum(url: URL, artist artistID: ArtistID, albumName: String) async {
+    private func scanAlbum(url: URL, artist artistID: ArtistID, albumName: String) async -> AlbumID? {
         // load _metadata folder
         let metadataURL = url.appendingPathComponent("_metadata", conformingTo: .directory)
         var albumArt: UIImage? = nil
@@ -217,7 +218,7 @@ album art can be in png, jpg or heic
             items = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [.isRegularFileKey, .isReadableKey])
         } catch {
             print("Cannot access directory \(url)")
-            return
+            return nil
         }
         
         let album = Album(name: albumName, artist: artistID, tracks: [], art: albumArt, genre: "Unknown Genre")
@@ -254,6 +255,8 @@ album art can be in png, jpg or heic
                 album.tracks.append(trackID)
             }
         }
+        
+        return albumID
     }
     
     private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?, includeArtwork: Bool) async -> (Track, UIImage?) {
@@ -305,8 +308,7 @@ album art can be in png, jpg or heic
         return (Int(discNum), Int(trackNum))
     }
     
-    private func addArtist(name: String) -> ArtistID {
-        let artist = Artist(name: name, albums: [])
+    private func addArtist(_ artist: Artist) -> ArtistID {
         let idx = artists.count
         artists.append(artist)
         return ArtistID(idx: idx)
