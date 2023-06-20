@@ -28,7 +28,6 @@ class Album {
 class Artist {
     var name: String
     var albums: [AlbumID]
-    // TODO: Singles
     
     init(name: String, albums: [AlbumID]) {
         self.name = name
@@ -223,6 +222,8 @@ album art can be in png, jpg or heic
         
         let album = Album(name: albumName, artist: artistID, tracks: [], art: albumArt, genre: "Unknown Genre")
         let albumID = addAlbum(album)
+        var tracks = [Track]()
+        tracks.reserveCapacity(items.count)
         for trackURL in items {
             switch trackURL.pathExtension {
             case "mp3", "flac", "m4a": break
@@ -239,22 +240,11 @@ album art can be in png, jpg or heic
             }
             
             // insertion sort tracks by disc and track number
-            let discNum = track.discNum ?? 0
-            let trackNum = track.trackNum ?? 0
-            let trackID = addTrack(track)
-            let insert_idx = album.tracks
-                .enumerated()
-                .first { (i, trackID) in
-                    let track = self.track(forID: trackID)
-                    return discNum <= track.discNum ?? 0 && trackNum <= track.trackNum ?? 0
-                }
-                .map { $0.0 }
-            if let insert_idx {
-                album.tracks.insert(trackID, at: insert_idx)
-            } else {
-                album.tracks.append(trackID)
-            }
+            tracks.append(track)
         }
+        
+        tracks.sort { ($0.discNum ?? 0) <= ($1.discNum ?? 0) && ($0.trackNum ?? 0) < ($1.trackNum ?? 0)}
+        album.tracks = tracks.map(addTrack(_:))
         
         return albumID
     }

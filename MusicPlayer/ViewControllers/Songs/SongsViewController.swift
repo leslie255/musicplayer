@@ -15,6 +15,8 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     
     @IBOutlet private weak var sortButton: UIBarButtonItem!
     
+    private var playerBarView: UIView!
+    
     private let searchController = UISearchController(searchResultsController: nil)
     
     private var sortMode: SongsSortMode = .random {
@@ -60,6 +62,7 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
             name: .musicLibraryFinishedSorting,
             object: nil
         )
+        initPlayerBar()
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
@@ -146,6 +149,16 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
+    }
+    
+    private func initPlayerBar() {
+//        playerBarView = UIView()
+//        playerBarView.backgroundColor = .systemTeal
+//        self.view.addSubview(playerBarView)
+//        self.view.addConstraint(playerBarView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor))
+//        self.view.addConstraint(playerBarView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor))
+//        self.view.addConstraint(playerBarView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor))
+//        playerBarView.addConstraint(NSLayoutDimension().constraint(equalToConstant: 160))
     }
     
 }
