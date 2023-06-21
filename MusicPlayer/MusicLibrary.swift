@@ -153,11 +153,17 @@ album art can be in png, jpg or heic
             NotificationCenter.default.post(Notification(name: .musicLibraryFinishedScanning))
         }
         
-        artistsByTitle = artists.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
-        albumsByTitle = albums.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
-        tracksByArtist = artistsByTitle.flatMap { $0.albums }.map(album(forID:)).flatMap { $0.tracks }.map(track(forID:))
-        tracksByAlbum = albumsByTitle.flatMap { $0.tracks.map { self.track(forID: $0) } }
-        tracksByTitle = tracks.sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
+        artistsByTitle = artists.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        albumsByTitle = albums.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        tracksByArtist = artistsByTitle.lazy
+            .flatMap { $0.albums }
+            .map(album(forID:))
+            .flatMap { $0.tracks }
+            .map(track(forID:))
+        tracksByAlbum = albumsByTitle.lazy
+            .flatMap { $0.tracks }
+            .map(track(forID:))
+        tracksByTitle = tracks.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         
         NotificationCenter.default.post(Notification(name: .musicLibraryFinishedSorting))
     }
@@ -224,11 +230,12 @@ album art can be in png, jpg or heic
         let albumID = addAlbum(album)
         var tracks = [Track]()
         tracks.reserveCapacity(items.count)
-        for trackURL in items {
-            switch trackURL.pathExtension {
-            case "mp3", "flac", "m4a": break
-            default: continue
-            }
+        
+        for trackURL in items
+        where trackURL.pathExtension.caseInsensitiveCompare("mp3") == .orderedSame
+        || trackURL.pathExtension.caseInsensitiveCompare("flac") == .orderedSame
+        || trackURL.pathExtension.caseInsensitiveCompare("m4a") == .orderedSame
+        {
             let track: Track
             if album.art == nil {
                 let (_track, artwork) = await scanTrack(url: trackURL, artist: artistID, album: albumID, includeArtwork: true)
@@ -239,11 +246,13 @@ album art can be in png, jpg or heic
                 track = _track
             }
             
-            // insertion sort tracks by disc and track number
             tracks.append(track)
         }
         
-        tracks.sort { ($0.discNum ?? 0) <= ($1.discNum ?? 0) && ($0.trackNum ?? 0) < ($1.trackNum ?? 0)}
+        tracks.sort {
+            ($1.discNum ?? 0) * 100 + ($1.trackNum ?? 0) > ($0.discNum ?? 0) * 100 + ($0.trackNum ?? 0)
+        }
+        
         album.tracks = tracks.map(addTrack(_:))
         
         return albumID

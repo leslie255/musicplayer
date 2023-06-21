@@ -297,9 +297,6 @@
                     </tableView>
                     <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="rZd-Ql-I1I"/>
                     <nil key="simulatedTopBarMetrics"/>
-                    <connections>
-                        <outlet property="mainTableView" destination="HWx-nM-Z8a" id="bxN-lb-vY9"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8MR-MJ-H14" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

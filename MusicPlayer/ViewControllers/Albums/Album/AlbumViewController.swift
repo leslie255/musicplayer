@@ -9,9 +9,18 @@ import UIKit
 
 class AlbumViewController: UITableViewController {
     
-    @IBOutlet var mainTableView: UITableView!
-    
     var album: Album! = nil
+    
+    /// The label for showing the title of the album in the first cell.
+    /// When it is under the naviagation bar, title of the album would be displayed on the navigation bar.
+    /// Set by `banner_cell(image:name:artist:genre:)`
+    unowned var albumTitleLabel: UIView?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.navigationController?.navigationBar.backItem?.title = nil
+    }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         self.album.tracks.count + 1
@@ -52,18 +61,37 @@ class AlbumViewController: UITableViewController {
         Player.shared.playTrack(track: track, albumArt: album.art, artistName: artist.name)
     }
     
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // calling `super.scrollViewDidScroll(_:)` crashes because UIKit magic ig
+        // note that this function is also called on initial loading
+        
+        // show album title on navigation bar if album title is hidden
+        guard let navController = self.navigationController else { return }
+        guard let albumTitleLabel else { return }
+        let albumTitleMaxY = self.view.convert(
+            CGPoint(x: 0, y: albumTitleLabel.frame.maxY),
+            to: self.view.coordinateSpace
+        ).y
+        let navigationBarMaxY = self.tableView.convert(
+            CGPoint(x: 0, y: navController.navigationBar.frame.maxY),
+            to: self.view.coordinateSpace
+        ).y
+        NSLog("\((albumTitleMaxY, navigationBarMaxY))")
+    }
+    
     private func banner_cell(image: UIImage?, name: String?, artist artistID: ArtistID, genre: String?) -> UITableViewCell {
         let artist = MusicLibrary.shared.artist(forID: artistID)
-        let cell = mainTableView.dequeueReusableCell(withIdentifier: "AlbumsBannerCell") as! AlbumBannerCell
+        let cell = self.tableView.dequeueReusableCell(withIdentifier: "AlbumsBannerCell") as! AlbumBannerCell
         cell.albumArtView.image = image ?? UIImage(systemName: "music.note.list")
         cell.nameLabel.text = name
         cell.artistLabel.text = artist.name
         cell.genreLabel.text = genre
+        albumTitleLabel = cell.nameLabel
         return cell
     }
     
     private func track_cell(num: Int?, name: String?) -> UITableViewCell {
-        let cell = mainTableView.dequeueReusableCell(withIdentifier: "AlbumsTrackCell") as! AlbumTrackCell
+        let cell = self.tableView.dequeueReusableCell(withIdentifier: "AlbumsTrackCell") as! AlbumTrackCell
         cell.numLabel.text = num.map(String.init)
         cell.nameLabel.text = name
         return cell
