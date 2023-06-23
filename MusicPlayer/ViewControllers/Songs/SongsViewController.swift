@@ -23,7 +23,7 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
         didSet {
             switch sortMode {
             case .random:
-                presentedTracks = MusicLibrary.shared.tracks
+                presentedTracks = MusicLibrary.shared.tracks.indices.map(TrackID.init(unsafeFromRawIndex:))
             case .byArtist:
                 presentedTracks = MusicLibrary.shared.tracksByArtist
             case .byAlbum:
@@ -39,7 +39,7 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     private var searchText: String?
     
     /// The tracks presented inside this VC, "points"
-    private var presentedTracks = MusicLibrary.shared.tracks
+    private var presentedTracks = [TrackID]()
     
     /// Tracks filtered by `searchText`
     private var filteredTracks = [Track]()
@@ -84,7 +84,7 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "SongsTrackCell", for: indexPath) as! SongsTrackCell
-        let track = presentedTracks[indexPath.row]
+        let track = MusicLibrary.shared.track(forID: presentedTracks[indexPath.row])
         let album = MusicLibrary.shared.album(forOptionalID: track.album)
         cell.trackLabel.text = track.name
         if sortMode == .byAlbum {
@@ -96,16 +96,16 @@ class SongsViewController: UITableViewController, UISearchBarDelegate {
         } else {
             cell.artistLabel.text = MusicLibrary.shared.artist(forID: track.artist).name
         }
-        let albumArtImage = album?.art ?? UIImage(systemName: "music.note")
+        let albumArtImage = album?.art?.uiImage ?? UIImage(systemName: "music.note")
         cell.albumArtView.image = albumArtImage
         return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let track = presentedTracks[indexPath.row]
+        let track = MusicLibrary.shared.track(forID: presentedTracks[indexPath.row])
         let albumArt = MusicLibrary.shared.album(forOptionalID: track.album)?.art
         let artistName = MusicLibrary.shared.artist(forID: track.artist).name
-        Player.shared.playTrack(track: track, albumArt: albumArt, artistName: artistName)
+        Player.shared.playTrack(track: track, albumArt: albumArt?.uiImage, artistName: artistName)
         tableView.deselectRow(at: indexPath, animated: true)
     }
     

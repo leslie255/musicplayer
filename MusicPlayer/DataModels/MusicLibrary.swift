@@ -9,14 +9,43 @@ import Foundation
 import AVFoundation
 import UIKit
 
-class Album {
+enum Asset {
+    case unloaded(URL), avAsset(URL, AVAsset)
+    
+    var url: URL {
+        switch self {
+        case .unloaded(let url):
+            return url
+        case .avAsset(let url, _):
+            return url
+        }
+    }
+}
+
+struct Artwork {
+    var data: Data {
+        didSet {
+            uiImage = UIImage(data: data)
+        }
+    }
+    
+    /// The `UIImage` from the data, `nil` if data is invalid
+    private(set) var uiImage: UIImage?
+    
+    init(data: Data) {
+        self.data = data
+        self.uiImage = UIImage(data: data)
+    }
+}
+
+class Album: Codable {
     var name: String
     var artist: ArtistID
     var tracks: [TrackID]
-    var art: UIImage?
+    var art: Artwork?
     var genre: String
     
-    init(name: String, artist: ArtistID, tracks: [TrackID], art: UIImage? = nil, genre: String) {
+    init(name: String, artist: ArtistID, tracks: [TrackID], art: Artwork? = nil, genre: String) {
         self.name = name
         self.artist = artist
         self.tracks = tracks
@@ -25,7 +54,7 @@ class Album {
     }
 }
 
-class Artist {
+class Artist: Codable {
     var name: String
     var albums: [AlbumID]
     
@@ -35,15 +64,16 @@ class Artist {
     }
 }
 
-class Track {
+class Track: Codable {
     var name: String
     var artist: ArtistID
     var album: AlbumID?
     var genre: String?
     var discNum: Int?
     var trackNum: Int?
-    var asset: AVAsset
-    var duration: CMTime?
+    var asset: Asset
+    /// In seconds
+    var duration: Double?
     
     init(
         name: String,
@@ -52,8 +82,8 @@ class Track {
         genre: String? = nil,
         discNum: Int? = nil,
         trackNum: Int? = nil,
-        asset: AVAsset,
-        duration: CMTime? = nil
+        asset: Asset,
+        duration: Double? = nil
     ) {
         self.name = name
         self.artist = artist
@@ -64,11 +94,29 @@ class Track {
         self.asset = asset
         self.duration = duration
     }
+    
 }
 
-struct ArtistID { fileprivate var idx: Int }
-struct AlbumID  { fileprivate var idx: Int }
-struct TrackID  { fileprivate var idx: Int }
+struct ArtistID: Codable {
+    fileprivate var idx: Int
+    init(unsafeFromRawIndex idx: Int) {
+        self.idx = idx
+    }
+}
+
+struct AlbumID: Codable {
+    fileprivate var idx: Int
+    init(unsafeFromRawIndex idx: Int) {
+        self.idx = idx
+    }
+}
+
+struct TrackID: Codable {
+    fileprivate var idx: Int
+    init(unsafeFromRawIndex idx: Int) {
+        self.idx = idx
+    }
+}
 
 class MusicLibrary {
     
@@ -83,8 +131,8 @@ Artist/
         song1.m4a
         song2.flac
 
-mp3, m4a, flac are all supported!
-album art can be in png, jpg or heic
+mp3, m4a, flac, aif are all supported!
+album art can be in png, jpg or heic (if none is provided the app will try to read from track metadata)
 """
     static var shared = MusicLibrary()
     
@@ -92,13 +140,13 @@ album art can be in png, jpg or heic
     var albums = [Album]()
     var artists = [Artist]()
     
-    var artistsByTitle = [Artist]()
+    var artistByName = [Artist]()
     
-    var albumsByTitle = [Album]()
+    var albumsByTitle = [AlbumID]()
     
-    var tracksByArtist = [Track]()
-    var tracksByAlbum = [Track]()
-    var tracksByTitle = [Track]()
+    var tracksByArtist = [TrackID]()
+    var tracksByAlbum = [TrackID]()
+    var tracksByTitle = [TrackID]()
     
     func track(forID id: TrackID) -> Track {
         tracks[id.idx]
@@ -150,20 +198,22 @@ album art can be in png, jpg or heic
             }
             
             for await _ in group {}
-            NotificationCenter.default.post(Notification(name: .musicLibraryFinishedScanning))
         }
         
-        artistsByTitle = artists.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        albumsByTitle = albums.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        tracksByArtist = artistsByTitle.lazy
+        artistByName = artists.sorted { $0.name >^ $1.name }
+        albumsByTitle = albums.indices.lazy
+            .map(AlbumID.init(unsafeFromRawIndex:))
+            .sorted { album(forID: $0).name >^ album(forID: $1).name }
+        tracksByArtist = artistByName.lazy
             .flatMap { $0.albums }
             .map(album(forID:))
             .flatMap { $0.tracks }
-            .map(track(forID:))
         tracksByAlbum = albumsByTitle.lazy
+            .map(album(forID:))
             .flatMap { $0.tracks }
-            .map(track(forID:))
-        tracksByTitle = tracks.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        tracksByTitle = tracks.indices.lazy
+            .map(TrackID.init(unsafeFromRawIndex:))
+            .sorted { track(forID: $0).name >^ track(forID: $1).name }
         
         NotificationCenter.default.post(Notification(name: .musicLibraryFinishedSorting))
     }
@@ -203,17 +253,17 @@ album art can be in png, jpg or heic
     private func scanAlbum(url: URL, artist artistID: ArtistID, albumName: String) async -> AlbumID? {
         // load _metadata folder
         let metadataURL = url.appendingPathComponent("_metadata", conformingTo: .directory)
-        var albumArt: UIImage? = nil
+        var albumArt: Artwork? = nil
         if let items = try? FileManager.default.contentsOfDirectory(at: metadataURL, includingPropertiesForKeys: [.isRegularFileKey, .isReadableKey]) {
             for item in items {
                 let filename = item.lastPathComponent
                 // album art
-                if filename.caseInsensitiveCompare("artwork.jpg") == .orderedSame
-                    || filename.caseInsensitiveCompare("artwork.jpeg") == .orderedSame
-                    || filename.caseInsensitiveCompare("artwork.heic") == .orderedSame
-                    || filename.caseInsensitiveCompare("artwork.png") == .orderedSame {
+                if filename ==~ "artwork.jpg"
+                    || filename ==~ "artwork.jpeg"
+                    || filename ==~ "artwork.heic"
+                    || filename ==~ "artwork.png" {
                     let data = try? Data(contentsOf: item)
-                    albumArt = data.flatMap(UIImage.init(data:))
+                    albumArt = data.flatMap(Artwork.init(data:))
                 }
             }
         }
@@ -232,9 +282,10 @@ album art can be in png, jpg or heic
         tracks.reserveCapacity(items.count)
         
         for trackURL in items
-        where trackURL.pathExtension.caseInsensitiveCompare("mp3") == .orderedSame
-        || trackURL.pathExtension.caseInsensitiveCompare("flac") == .orderedSame
-        || trackURL.pathExtension.caseInsensitiveCompare("m4a") == .orderedSame
+        where trackURL.pathExtension ==~ "mp3"
+        || trackURL.pathExtension ==~ "flac"
+        || trackURL.pathExtension ==~ "m4a"
+        || trackURL.pathExtension ==~ "aif"
         {
             let track: Track
             if album.art == nil {
@@ -250,7 +301,7 @@ album art can be in png, jpg or heic
         }
         
         tracks.sort {
-            ($1.discNum ?? 0) * 100 + ($1.trackNum ?? 0) > ($0.discNum ?? 0) * 100 + ($0.trackNum ?? 0)
+            ($1.discNum ?? 0) * 128 + ($1.trackNum ?? 0) > ($0.discNum ?? 0) * 128 + ($0.trackNum ?? 0)
         }
         
         album.tracks = tracks.map(addTrack(_:))
@@ -258,10 +309,10 @@ album art can be in png, jpg or heic
         return albumID
     }
     
-    private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?, includeArtwork: Bool) async -> (Track, UIImage?) {
+    private func scanTrack(url: URL, artist artistID: ArtistID, album albumID: AlbumID?, includeArtwork: Bool) async -> (Track, Artwork?) {
         let asset = AVAsset(url: url)
         var name: String?
-        var artwork: UIImage?
+        var artwork: Artwork?
         let metadataItems = try? await asset.load(.metadata)
         let fileName = url.lastPathComponent
         for metadata in metadataItems ?? [] {
@@ -271,12 +322,12 @@ album art can be in png, jpg or heic
             case AVMetadataKey.commonKeyArtwork:
                 if includeArtwork {
                     let data = try? await metadata.load(.dataValue)
-                    artwork = data.flatMap(UIImage.init(data:))
+                    artwork = data.flatMap(Artwork.init(data:))
                 }
             default: break
             }
         }
-        let duration = try? await asset.load(.duration)
+        let duration = try? await asset.load(.duration).seconds
         let (discNum, trackNum) = getDiscAndTrackName(fileName: fileName)
         let track = Track(
             name: name ?? fileName,
@@ -284,7 +335,7 @@ album art can be in png, jpg or heic
             album: albumID,
             discNum: discNum,
             trackNum: trackNum,
-            asset: asset,
+            asset: .avAsset(url, asset),
             duration: duration
         )
         return (track, artwork)
@@ -292,7 +343,7 @@ album art can be in png, jpg or heic
     
     private func getDiscAndTrackName(fileName: String) -> (Int?, Int?) {
         func charAsDigit(char: UInt32) -> UInt32? {
-            let digit = char &- 0x30
+            let digit = char &- 0x30    // 0x30 is '0' in ASCII
             return digit < 10 ? digit : nil
         }
         var chars = fileName.unicodeScalars.makeIterator()
@@ -310,19 +361,19 @@ album art can be in png, jpg or heic
     private func addArtist(_ artist: Artist) -> ArtistID {
         let idx = artists.count
         artists.append(artist)
-        return ArtistID(idx: idx)
+        return ArtistID(unsafeFromRawIndex: idx)
     }
     
     private func addAlbum(_ album: Album) -> AlbumID {
         let idx = albums.count
         albums.append(album)
-        return AlbumID(idx: idx)
+        return AlbumID(unsafeFromRawIndex: idx)
     }
     
     private func addTrack(_ track: Track) -> TrackID {
         let idx = tracks.count
         tracks.append(track)
-        return TrackID(idx: idx)
+        return TrackID(unsafeFromRawIndex: idx)
     }
     
     private func createMessageTxt(at dir: URL) {

@@ -38,7 +38,7 @@ class AlbumViewController: UITableViewController {
         if indexPath.row == 0 {
             // the banner cell
             return self.banner_cell(
-                image: album.art,
+                image: album.art?.uiImage,
                 name: album.name,
                 artist: album.artist,
                 genre: album.genre
@@ -58,26 +58,26 @@ class AlbumViewController: UITableViewController {
         guard let trackID = self.album.tracks[checked: indexPath.row - 1] else { return }
         let track = MusicLibrary.shared.track(forID: trackID)
         let artist = MusicLibrary.shared.artist(forID: album.artist)
-        Player.shared.playTrack(track: track, albumArt: album.art, artistName: artist.name)
+        Player.shared.playTrack(track: track, albumArt: album.art?.uiImage, artistName: artist.name)
     }
     
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // calling `super.scrollViewDidScroll(_:)` crashes because UIKit magic ig
-        // note that this function is also called on initial loading
-        
-        // show album title on navigation bar if album title is hidden
-        guard let navController = self.navigationController else { return }
-        guard let albumTitleLabel else { return }
-        let albumTitleMaxY = self.view.convert(
-            CGPoint(x: 0, y: albumTitleLabel.frame.maxY),
-            to: self.view.coordinateSpace
-        ).y
-        let navigationBarMaxY = self.tableView.convert(
-            CGPoint(x: 0, y: navController.navigationBar.frame.maxY),
-            to: self.view.coordinateSpace
-        ).y
-        NSLog("\((albumTitleMaxY, navigationBarMaxY))")
-    }
+//    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        // calling `super.scrollViewDidScroll(_:)` crashes because UIKit magic ig
+//        // note that this function is also called on initial loading
+//
+//        // show album title on navigation bar if album title is hidden
+//        guard let navController = self.navigationController else { return }
+//        guard let albumTitleLabel else { return }
+//        let albumTitleMaxY = self.view.convert(
+//            CGPoint(x: 0, y: albumTitleLabel.frame.maxY),
+//            to: self.view.coordinateSpace
+//        ).y
+//        let navigationBarMaxY = self.tableView.convert(
+//            CGPoint(x: 0, y: navController.navigationBar.frame.maxY),
+//            to: self.view.coordinateSpace
+//        ).y
+//        NSLog("\((albumTitleMaxY, navigationBarMaxY))")
+//    }
     
     private func banner_cell(image: UIImage?, name: String?, artist artistID: ArtistID, genre: String?) -> UITableViewCell {
         let artist = MusicLibrary.shared.artist(forID: artistID)

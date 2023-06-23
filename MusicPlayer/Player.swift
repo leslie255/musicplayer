@@ -40,7 +40,15 @@ class Player {
     }
     
     func playTrack(track: Track, albumArt: UIImage?, artistName: String?) {
-        avplayer.replaceCurrentItem(with: AVPlayerItem(asset: track.asset))
+        let avAsset: AVAsset
+        switch track.asset {
+        case .avAsset(_, let _asset):
+            avAsset = _asset
+        case .unloaded(let url):
+            avAsset = AVAsset(url: url)
+        }
+        
+        avplayer.replaceCurrentItem(with: AVPlayerItem(asset: avAsset))
         avplayer.play()
         
         // setup Now Playing display
@@ -54,9 +62,9 @@ class Player {
         }
         nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = avplayer.currentTime().seconds
         if let duration = track.duration {
-            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration.seconds
+            nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration
         }
-        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = Double(1)
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = 1.0
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     

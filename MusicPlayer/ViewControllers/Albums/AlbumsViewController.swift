@@ -41,7 +41,7 @@ class AlbumsViewController: UICollectionViewController, UICollectionViewDelegate
         let album = MusicLibrary.shared.albums[indexPath.row]
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AlbumsCell", for: indexPath) as! AlbumsCell
         cell.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapOnAlbum(_:))))
-        cell.albumArtView.image = album.art ?? UIImage(systemName: "music.note.list")
+        cell.albumArtView.image = album.art?.uiImage ?? UIImage(systemName: "music.note.list")
         cell.nameLabel.text = album.name
         cell.artistLabel.text = MusicLibrary.shared.artist(forID: album.artist).name
         return cell

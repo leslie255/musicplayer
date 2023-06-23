@@ -19,8 +19,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <color key="tintColor" systemColor="systemPinkColor"/>
-                        <color key="selectedImageTintColor" systemColor="systemPinkColor"/>
+                        <color key="tintColor" systemColor="systemTealColor"/>
+                        <color key="selectedImageTintColor" systemColor="systemTealColor"/>
                     </tabBar>
                     <connections>
                         <segue destination="KkY-fG-sip" kind="relationship" relationship="viewControllers" id="058-83-U1L"/>
@@ -123,10 +123,10 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Songs" id="jEc-eP-Ly3">
-                        <barButtonItem key="rightBarButtonItem" title="Item" id="s6I-kN-tA2">
-                            <imageReference key="image" image="arrow.up.arrow.down.circle.fill" catalog="system" symbolScale="default" renderingMode="hierarchical">
+                        <barButtonItem key="rightBarButtonItem" title="Sort" style="plain" id="s6I-kN-tA2">
+                            <imageReference key="image" image="arrow.up.arrow.down.circle.fill" catalog="system" symbolScale="large" renderingMode="hierarchical">
                                 <hierarchicalColors>
-                                    <color systemColor="systemPinkColor"/>
+                                    <color systemColor="systemTealColor"/>
                                     <color systemColor="secondaryLabelColor"/>
                                     <color systemColor="secondarySystemFillColor"/>
                                 </hierarchicalColors>
@@ -149,7 +149,7 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="eql-GU-oQe">
                         <rect key="frame" x="0.0" y="50" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="tintColor" systemColor="systemPinkColor"/>
+                        <color key="tintColor" systemColor="systemTealColor"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="p1R-DB-svO">
                         <autoresizingMask key="autoresizingMask"/>
@@ -172,9 +172,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <color key="tintColor" systemColor="systemPinkColor"/>
+                        <navigationBar key="tableHeaderView" contentMode="scaleToFill" id="A7i-0B-uYl">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <color key="tintColor" systemColor="systemTealColor"/>
+                        </navigationBar>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="AlbumsBannerCell" id="7Qj-Ps-JJh" customClass="AlbumBannerCell" customModule="MusicPlayer" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="50" width="375" height="347"/>
+                                <rect key="frame" x="0.0" y="94" width="375" height="347"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="7Qj-Ps-JJh" id="gat-Vo-bIe">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="347"/>
@@ -200,7 +205,7 @@
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Hs-bN-Tg5">
                                                     <rect key="frame" x="0.0" y="24" width="335" height="24"/>
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="20"/>
-                                                    <color key="textColor" systemColor="systemPinkColor"/>
+                                                    <color key="textColor" systemColor="systemTealColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Genre" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jDi-NW-mYD">
@@ -239,7 +244,7 @@
                                 </connections>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="AlbumsTrackCell" rowHeight="44" id="wX8-AW-b49" customClass="AlbumTrackCell" customModule="MusicPlayer" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="397" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="441" width="375" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="wX8-AW-b49" id="URB-w6-lxf">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -435,6 +440,9 @@
         </systemColor>
         <systemColor name="systemPinkColor">
             <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemTealColor">
+            <color red="0.18823529411764706" green="0.69019607843137254" blue="0.7803921568627451" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
